@@ -1,15 +1,17 @@
 package br.com.mvbos.emundos;
 
-import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.image.BufferedImage;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
+import br.com.mvbos.emundos.sc.Planeta;
 import br.com.mvbos.jeg.element.ElementMovableModel;
 import br.com.mvbos.jeg.engine.Engine;
 import br.com.mvbos.jeg.engine.GameEngineModel;
@@ -26,13 +28,13 @@ public class Window extends JFrame implements IWindowGame {
 
 	private JPanel canvas;
 	private BufferedImage buffer;
-	private int w = 600;
-	private int h = 600;
+	private int w = 928;
+	private int h = 696;
 
 	private IScene scene;
 
 	private boolean freeze = true;
-	
+
 	private final GameEngineModel gem = new GameEngineModel(0);
 
 	public void init() {
@@ -43,7 +45,7 @@ public class Window extends JFrame implements IWindowGame {
 
 			@Override
 			public void paintComponent(Graphics g) {
-				super.paintComponent(g);
+				// super.paintComponent(g);
 				g.drawImage(buffer, 0, 0, null);
 			}
 		};
@@ -63,6 +65,10 @@ public class Window extends JFrame implements IWindowGame {
 					Engine.log("h hei", h);
 
 					buffer = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
+
+					if (scene != null) {
+						scene.resizeWindow();
+					}
 				}
 
 			}
@@ -77,6 +83,27 @@ public class Window extends JFrame implements IWindowGame {
 			}
 		});
 		// setResizable(false);
+
+		addKeyListener(new KeyListener() {
+
+			@Override
+			public void keyTyped(KeyEvent e) {
+				// TODO Auto-generated method stub
+			}
+
+			@Override
+			public void keyReleased(KeyEvent e) {
+				// TODO Auto-generated method stub
+
+			}
+
+			@Override
+			public void keyPressed(KeyEvent e) {
+				if (scene != null) {
+					scene.keyEvent(e.getKeyChar(), e.getKeyCode());
+				}
+			}
+		});
 
 		setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 		getContentPane().add(canvas);
@@ -136,15 +163,15 @@ public class Window extends JFrame implements IWindowGame {
 
 		Graphics2D g2d = buffer.createGraphics();
 
-		// clear
-		g2d.setColor(Color.BLACK);
-		g2d.fillRect(0, 0, getWidth(), getHeight());
+		if (scene != null) {
+			// clear
+			g2d.setColor(scene.getBgColor());
+			g2d.fillRect(0, 0, getWidth(), getHeight());
 
-		if (scene != null)
 			scene.drawElements(g2d);
 
-
-		canvas.repaint();
+			canvas.repaint();
+		}
 		g2d.dispose();
 	}
 
@@ -165,6 +192,16 @@ public class Window extends JFrame implements IWindowGame {
 	}
 
 	@Override
+	public int getCanvasWidth() {
+		return canvas.getWidth();
+	}
+
+	@Override
+	public int getCanvasHeight() {
+		return canvas.getHeight();
+	}
+
+	@Override
 	public void selectMovableElement(ElementMovableModel e) {
 		// TODO Auto-generated method stub
 
@@ -179,7 +216,8 @@ public class Window extends JFrame implements IWindowGame {
 	public static void main(String[] args) {
 		Window game = new Window();
 		game.init();
-		game.changeScene(new SceneDefault());
+		// game.changeScene(new SceneDefault());
+		game.changeScene(new Planeta());
 	}
 
 }
