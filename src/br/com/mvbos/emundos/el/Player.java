@@ -22,7 +22,7 @@ public class Player extends ElementModel {
 
 	@Override
 	public void update() {
-		if(dir > 0)
+		if (dir > 0)
 			dir--;
 	}
 
@@ -38,12 +38,12 @@ public class Player extends ElementModel {
 			} else if (dir <= 20) {
 				tempX = 40;
 			} else if (dir <= 30) {
-				dir = 0;//jump
+				dir = 0;// jump
 			} else if (dir <= 40) {
 				dir = 0;
 			}
 
-			//drawBorders(g2d);
+			// drawBorders(g2d);
 
 			AffineTransform old = g2d.getTransform();
 
@@ -53,16 +53,14 @@ public class Player extends ElementModel {
 
 				g2d.setTransform(tx);
 
-				g2d.drawImage(getImage().getImage(), (getPx() * -1)
-						+ getImage().getIconWidth() - 20, getPy(),
-						(getPx() * -1) + getImage().getIconWidth(),
-						getPy() + 40, tempX, 00, tempX + 20, 40, null);
-
+				g2d.drawImage(getImage().getImage(), 
+						(getPx() * -1) + getImage().getIconWidth() - getWidth(), getPy(),
+						(getPx() * -1) + getImage().getIconWidth(), getPy() + getHeight(), 
+						tempX, 0, tempX + getWidth(), getHeight(), null);
 			} else {
-
-				g2d.drawImage(getImage().getImage(), getPx(), getPy(),
-						getPx() + 20, getPy() + 40, tempX, 00, tempX + 20, 40,
-						null);
+				g2d.drawImage(getImage().getImage(), getPx(), getPy(), getPx()
+						+ getWidth(), getPy() + getHeight(), tempX, 0, tempX
+						+ getWidth(), getHeight(), null);
 			}
 
 			g2d.setTransform(old);
@@ -77,8 +75,8 @@ public class Player extends ElementModel {
 		g2d.drawRect(getPx(), getPy(), getWidth(), getHeight());
 
 		g2d.setColor(Color.GREEN);
-		g2d.drawRect(getPx(), getPy(), getImage().getIconWidth(),
-				getImage().getIconHeight());
+		g2d.drawRect(getPx(), getPy(), getImage().getIconWidth(), getImage()
+				.getIconHeight());
 	}
 
 	public void setDirection(boolean invert, int dir) {
@@ -86,7 +84,7 @@ public class Player extends ElementModel {
 			this.invert = invert;
 			this.dir = 0;
 		} else {
-			this.dir+=2;
+			this.dir += 2;
 		}
 	}
 

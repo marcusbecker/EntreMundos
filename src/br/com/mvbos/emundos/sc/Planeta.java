@@ -48,8 +48,8 @@ public class Planeta extends SceneDefault {
 
 	@Override
 	public void resizeWindow() {
-		p.setPy(Engine.getIWindowGame().getCanvasHeight() - p.getHeight() - 10);
-		n.setPy(Engine.getIWindowGame().getCanvasHeight() - n.getHeight() - 10);
+		p.setPy(Engine.getIWindowGame().getCanvasHeight() - 40);
+		n.setPy(Engine.getIWindowGame().getCanvasHeight() - 60);
 	}
 
 	@Override
@@ -59,7 +59,7 @@ public class Planeta extends SceneDefault {
 			return;
 		}
 
-		for (int i = 0; i < memo.getElementCount(); i++) {
+		for (int i = memo.getElementCount() - 1; i >= 0; i--) {
 			if (memo.getByElement(i).isVisible()) {
 				memo.getByElement(i).drawMe(g2d);
 			}
@@ -82,6 +82,8 @@ public class Planeta extends SceneDefault {
 			p.incPx(+1);
 			p.setDirection(false, 1);
 		}
+		
+		n.setInside(G.collide(p, n) != null);
 		
 		if(G.collide(p, n) != null){
 			//abrir contexto nave
