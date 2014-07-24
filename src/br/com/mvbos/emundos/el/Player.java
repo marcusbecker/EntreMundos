@@ -38,8 +38,10 @@ public class Player extends ElementModel {
 			} else if (dir <= 20) {
 				tempX = 40;
 			} else if (dir <= 30) {
-				dir = 0;// jump
+				tempX = 60;
 			} else if (dir <= 40) {
+				tempX = 80;
+			}else{
 				dir = 0;
 			}
 
@@ -86,6 +88,10 @@ public class Player extends ElementModel {
 		} else {
 			this.dir += 2;
 		}
+	}
+	
+	public void stop(){
+		this.dir = 0;
 	}
 
 }

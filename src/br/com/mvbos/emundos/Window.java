@@ -93,8 +93,7 @@ public class Window extends JFrame implements IWindowGame {
 
 			@Override
 			public void keyReleased(KeyEvent e) {
-				// TODO Auto-generated method stub
-
+				scene.keyRelease(e.getKeyChar(), e.getKeyCode());
 			}
 
 			@Override
@@ -172,6 +171,7 @@ public class Window extends JFrame implements IWindowGame {
 
 			canvas.repaint();
 		}
+		
 		g2d.dispose();
 	}
 

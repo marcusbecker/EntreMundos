@@ -2,6 +2,7 @@ package br.com.mvbos.emundos.sc;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.geom.AffineTransform;
 
 import br.com.mvbos.emundos.el.Nave;
 import br.com.mvbos.emundos.el.Player;
@@ -36,7 +37,7 @@ public class Planeta extends SceneDefault {
 
 	@Override
 	public Color getBgColor() {
-		return Color.WHITE;
+		return Color.ORANGE;
 	}
 
 	@Override
@@ -64,6 +65,11 @@ public class Planeta extends SceneDefault {
 				memo.getByElement(i).drawMe(g2d);
 			}
 		}
+		
+		
+		//AffineTransform old = g2d.getTransform();
+		AffineTransform tx = AffineTransform.getScaleInstance(-1, 1);
+		g2d.setTransform(tx);
 	}
 
 	@Override
@@ -88,5 +94,10 @@ public class Planeta extends SceneDefault {
 		if(G.collide(p, n) != null){
 			//abrir contexto nave
 		}
+	}
+	
+	@Override
+	public void keyRelease(char keyChar, int keyCode) {
+		p.stop();
 	}
 }

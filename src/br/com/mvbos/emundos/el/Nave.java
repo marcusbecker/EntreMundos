@@ -13,7 +13,7 @@ public class Nave extends ElementModel {
 
 	@Override
 	public void loadElement() {
-		setSize(80, 60);
+		setSize(85, 60);
 		setImage(new ImageIcon(Config.PATH + "n.png"));
 	}
 
