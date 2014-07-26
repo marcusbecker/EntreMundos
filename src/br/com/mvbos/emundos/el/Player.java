@@ -2,17 +2,18 @@ package br.com.mvbos.emundos.el;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
-import java.awt.geom.AffineTransform;
 
 import javax.swing.ImageIcon;
 
 import br.com.mvbos.emundos.Config;
 import br.com.mvbos.jeg.element.ElementModel;
+import br.com.mvbos.jeg.engine.SpriteTool;
 
 public class Player extends ElementModel {
 
 	int dir = 0; // direction
 	private boolean invert;
+	private int state;
 
 	@Override
 	public void loadElement() {
@@ -29,43 +30,37 @@ public class Player extends ElementModel {
 	@Override
 	public void drawMe(Graphics2D g2d) {
 		if (getImage() != null) {
-			int tempX = 0;
+			int col = 0;
+			int line = 0;
 
 			if (dir == 0) {
-				tempX = 0;
+				col = 0;
+
 			} else if (dir <= 10) {
-				tempX = 20;
+				col = 1;
+
 			} else if (dir <= 20) {
-				tempX = 40;
+				col = 2;
+
 			} else if (dir <= 30) {
-				tempX = 60;
+				col = 3;
+
 			} else if (dir <= 40) {
-				tempX = 80;
-			}else{
+				col = 4;
+
+			} else {
 				dir = 0;
 			}
 
-			// drawBorders(g2d);
-
-			AffineTransform old = g2d.getTransform();
-
-			if (invert) {
-				AffineTransform tx = AffineTransform.getScaleInstance(-1, 1);
-				tx.translate(-getImage().getIconWidth(), 0);
-
-				g2d.setTransform(tx);
-
-				g2d.drawImage(getImage().getImage(), 
-						(getPx() * -1) + getImage().getIconWidth() - getWidth(), getPy(),
-						(getPx() * -1) + getImage().getIconWidth(), getPy() + getHeight(), 
-						tempX, 0, tempX + getWidth(), getHeight(), null);
-			} else {
-				g2d.drawImage(getImage().getImage(), getPx(), getPy(), getPx()
-						+ getWidth(), getPy() + getHeight(), tempX, 0, tempX
-						+ getWidth(), getHeight(), null);
+			if (state == 1) {
+				col = 2;
+				line = 1;
 			}
 
-			g2d.setTransform(old);
+			SpriteTool s = SpriteTool.s(getImage()).matriz(5, 2);
+			// drawBorders(g2d);
+
+			s.invert(invert).draw(g2d, getPx(), getPy(), col, line);
 
 		} else {
 			super.drawMe(g2d);
@@ -77,8 +72,7 @@ public class Player extends ElementModel {
 		g2d.drawRect(getPx(), getPy(), getWidth(), getHeight());
 
 		g2d.setColor(Color.GREEN);
-		g2d.drawRect(getPx(), getPy(), getImage().getIconWidth(), getImage()
-				.getIconHeight());
+		g2d.drawRect(getPx(), getPy(), getImage().getIconWidth(), getImage().getIconHeight());
 	}
 
 	public void setDirection(boolean invert, int dir) {
@@ -89,9 +83,14 @@ public class Player extends ElementModel {
 			this.dir += 2;
 		}
 	}
-	
-	public void stop(){
+
+	public void stop() {
 		this.dir = 0;
+	}
+
+	public void setState(int state) {
+		this.state = state;
+		System.out.println("sjsjsjsjsj");
 	}
 
 }

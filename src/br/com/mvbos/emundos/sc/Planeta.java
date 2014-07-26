@@ -76,23 +76,26 @@ public class Planeta extends SceneDefault {
 	public void keyEvent(char keyChar, int keyCode) {
 		if (keyCode == keys[0]) {
 			// cima
+			n.action();
 		} else if (keyCode == keys[1]) {
 			// baixo
 
 		} else if (keyCode == keys[2]) {
 			// esq
-			p.incPx(-1);
+			p.incPx(-2);
 			p.setDirection(true, 1);
 		} else if (keyCode == keys[3]) {
 			// dir
-			p.incPx(+1);
+			p.incPx(+2);
 			p.setDirection(false, 1);
 		}
 		
-		n.setInside(G.collide(p, n) != null);
+		//n.setInside(G.collide(p, n) != null);
 		
-		if(G.collide(p, n) != null){
-			//abrir contexto nave
+		if (G.collide(p, n) != null) {
+			n.setPlayer(p);
+		} else {
+			n.setPlayer(null);
 		}
 	}
 	
