@@ -8,11 +8,12 @@ import br.com.mvbos.emundos.el.Nave;
 import br.com.mvbos.emundos.el.Player;
 import br.com.mvbos.jeg.engine.Engine;
 import br.com.mvbos.jeg.engine.GraphicTool;
+import br.com.mvbos.jeg.engine.KeysMap;
 import br.com.mvbos.jeg.scene.impl.SceneDefault;
 import br.com.mvbos.jeg.window.impl.MemoryImpl;
 
 public class Planeta extends SceneDefault {
-
+	
 	private static final GraphicTool G = GraphicTool.g();
 	private Player p = new Player();
 	private Nave n = new Nave();
@@ -68,26 +69,31 @@ public class Planeta extends SceneDefault {
 		
 		
 		//AffineTransform old = g2d.getTransform();
-		AffineTransform tx = AffineTransform.getScaleInstance(-1, 1);
-		g2d.setTransform(tx);
+		//AffineTransform tx = AffineTransform.getScaleInstance(-1, 1);
+		//g2d.setTransform(tx);
 	}
 
 	@Override
 	public void keyEvent(char keyChar, int keyCode) {
 		if (keyCode == keys[0]) {
-			// cima
-			n.action();
+			p.go(KeysMap.UP);
+			n.go(KeysMap.UP);
+			
 		} else if (keyCode == keys[1]) {
-			// baixo
-
+			p.go(KeysMap.DOWN);
+			n.go(KeysMap.DOWN);
+			
 		} else if (keyCode == keys[2]) {
-			// esq
-			p.incPx(-2);
-			p.setDirection(true, 1);
+			p.go(KeysMap.LEFT);
+			n.go(KeysMap.LEFT);
+
 		} else if (keyCode == keys[3]) {
-			// dir
-			p.incPx(+2);
-			p.setDirection(false, 1);
+			p.go(KeysMap.RIGHT);
+			n.go(KeysMap.RIGHT);
+
+		} else /*if (keyCode == keys[4])*/ {
+			p.action();
+			n.action();			
 		}
 		
 		//n.setInside(G.collide(p, n) != null);
@@ -104,3 +110,4 @@ public class Planeta extends SceneDefault {
 		p.stop();
 	}
 }
+
