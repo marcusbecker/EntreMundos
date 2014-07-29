@@ -29,10 +29,16 @@ public class Nave extends ElementModel {
 
 	// private ElementModel contexto;
 
+	private ImageIcon fogo;
+	
+	private boolean started;
+
 	@Override
 	public void loadElement() {
 		setSize(85, 60);
 		setImage(new ImageIcon(Config.PATH + "n.png"));
+
+		fogo = new ImageIcon(Config.PATH + "fogo.png");
 
 		controle = new Menu(0, 0, 10, 10);
 		controle.setNave(this);
@@ -43,16 +49,21 @@ public class Nave extends ElementModel {
 		if (player != null) {
 			controle.update();
 
+			//TODO state nave estavel
+			
+			player.setVisible(!started);
+			
 			if (GraphicTool.g().collide(player, controle) != null) {
 				controle.setVisible(true);
 
 				if (action) {
-					System.out.println("Action");
+
 					if (controle.isActive()) {
 						// free player
 						player.reposition(isInvert(), controle.getPx(), controle.getAllHeight() - player.getHeight());
 						player.setState(Player.State.DEF);
 						controle.setActive(false);
+						started = false;
 
 					} else {
 						// hold player
@@ -66,19 +77,20 @@ public class Nave extends ElementModel {
 				controle.setVisible(false);
 			}
 
-			if (controle.isActive()) {
+			if (controle.isActive() || started) {
 				player.reposition(isInvert(), controle.getPx() - 5, controle.getAllHeight() - player.getHeight());
 			}
 		}
 
 		action = false;
+		//Apply gravit
 		if (getAllHeight() < Engine.getIWindowGame().getCanvasHeight()) {
 			incPy(0.5f - vel);
-			
-			if(vel > 0f)
-				vel -= velInc / 2f;//0.005f;
+
+			/*if (vel > 0f)
+				vel -= velInc / 2f;// 0.005f;
 			else
-				vel = 0f;
+				vel = 0f;*/
 		}
 	}
 
@@ -86,13 +98,19 @@ public class Nave extends ElementModel {
 	public void drawMe(Graphics2D g2d) {
 		SpriteTool s = SpriteTool.s(getImage()).matriz(2, 1);
 
-		if (player != null) {
+		if (player != null && !started) {
 
 			s.invert(false).draw(g2d, getPx(), getPy(), 1, 0);
 			controle.drawMe(g2d);
 
 		} else {
 			s.invert(false).draw(g2d, getPx(), getPy(), 0, 0);
+			
+			if (started) {
+				s = SpriteTool.s(fogo).matriz(5, 1);
+				s.invert(false).draw(g2d, getPx() + 25, getAllHeight() - 21, SpriteTool.SORT, 0);
+				
+			}
 		}
 	}
 
@@ -127,7 +145,7 @@ public class Nave extends ElementModel {
 			up();
 			break;
 		case DOWN:
-			vel -= 0.01f;//incPy(+1);
+			down();
 			break;
 		case LEFT:
 			// setDirection(true);
@@ -144,7 +162,12 @@ public class Nave extends ElementModel {
 		update();
 	}
 
+	private void down() {
+		vel -= 0.01f;// incPy(+1);
+	}
+
 	private void up() {
+		started = true;
 		if (vel < velMax) {
 			vel += velInc;
 		}

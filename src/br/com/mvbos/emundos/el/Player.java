@@ -12,7 +12,7 @@ import br.com.mvbos.jeg.engine.SpriteTool;
 public class Player extends ElementModel {
 
 	public enum State {
-		DEF, IN;
+		DEF, IN, IN_CONTROLLER;
 	}
 
 	int dir = 0; // direction
