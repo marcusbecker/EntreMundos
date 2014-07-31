@@ -2,7 +2,6 @@ package br.com.mvbos.emundos.sc;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
-import java.awt.geom.AffineTransform;
 
 import br.com.mvbos.emundos.el.Nave;
 import br.com.mvbos.emundos.el.Player;
@@ -100,8 +99,11 @@ public class Planeta extends SceneDefault {
 		
 		if (G.collide(p, n) != null) {
 			n.setPlayer(p);
+			p.setNave(n);
+			
 		} else {
 			n.setPlayer(null);
+			p.setNave(null);
 		}
 	}
 	

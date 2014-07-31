@@ -12,7 +12,7 @@ public class Menu extends ElementModel {
 
 	@Override
 	public void drawMe(Graphics2D g2d) {
-		//drawBorders(g2d);
+		drawBorders(g2d);
 		if (isVisible() && !isActive()) {
 			g2d.setColor(Color.BLUE);
 			g2d.fillRect(getPx() + 5, nave.getPy() - 150, 100, 100);
@@ -25,6 +25,7 @@ public class Menu extends ElementModel {
 
 	@Override
 	public void update() {
+		setVisible(false);
 		if (nave.isInvert()) {
 			setPxy(nave.getPx() + 20, nave.getAllHeight() - getHeight());
 		} else {

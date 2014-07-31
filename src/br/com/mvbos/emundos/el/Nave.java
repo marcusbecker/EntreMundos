@@ -13,9 +13,11 @@ import br.com.mvbos.jeg.engine.SpriteTool;
 
 public class Nave extends ElementModel {
 
+	private static final float RANGE = 0.1f;
+
 	private Player player;
 
-	private Menu controle;
+	private Menu naveControl;
 
 	private boolean action;
 
@@ -23,15 +25,37 @@ public class Nave extends ElementModel {
 
 	private float vel;
 
-	private float velMax = 5f;
+	private float velMax = 2f;
 
-	private float velInc = 0.02f;
+	private float velInc = 0.08f;
+
+	private float velRise;
+
+	private float velRiseMax = 1.5f;
+
+	private float velRiseInc = 0.02f;
 
 	// private ElementModel contexto;
 
 	private ImageIcon fogo;
-	
-	private boolean started;
+
+	private boolean on;
+
+	boolean open;
+
+	private boolean stable;
+
+	private boolean up;
+
+	private boolean down;
+
+	private float oldVel;
+
+	private boolean lft;
+
+	private boolean rgt;
+
+	private int life;
 
 	@Override
 	public void loadElement() {
@@ -40,57 +64,238 @@ public class Nave extends ElementModel {
 
 		fogo = new ImageIcon(Config.PATH + "fogo.png");
 
-		controle = new Menu(0, 0, 10, 10);
-		controle.setNave(this);
+		naveControl = new Menu(0, 0, 10, 10);
+		naveControl.setNave(this);
 	}
 
 	@Override
 	public void update() {
-		if (player != null) {
-			controle.update();
 
-			//TODO state nave estavel
+		processKeyPress();
+
+		// open = player != null && !on;
+
+		naveControl.update();
+
+		if (player != null) {
+
+			if (player.getState() == Player.State.DEF) {
+				open = true;
+
+			} else if (player.getState() == Player.State.IN) {
+				open = true;
+				player.setVisible(open);
+
+			} else if (player.getState() == Player.State.IN_CONTROLLER) {
+				player.setVisible(open);
+				player.setPxy(naveControl.getPx() - 5, naveControl.getAllHeight() - player.getHeight());
+
+			}
+
+			if (naveControl.isActive() || GraphicTool.g().collide(player, naveControl) != null) {
+
+				naveControl.setVisible(player.getState() != Player.State.IN_CONTROLLER);
+
+				if (action) {
+					System.out.println("action");
+					if (naveControl.isActive()) {
+						player.reposition(isInvert(), naveControl.getPx(),
+								naveControl.getAllHeight() - player.getHeight());
+
+						player.setState(Player.State.IN);
+						naveControl.setActive(false);
+
+					} else {
+						player.reposition(isInvert(), naveControl.getPx() - 5,
+								naveControl.getAllHeight() - player.getHeight());
+
+						player.setState(Player.State.IN_CONTROLLER);
+						naveControl.setActive(true);
+					}
+
+				} else {
+					// player.reposition(isInvert(), naveControl.getPx(),
+					// naveControl.getAllHeight() - player.getHeight());
+				}
+
+				action = false;
+
+			}
+
+			/*
+			 * if (player.getState() != Player.State.DEF) {
+			 * player.setPy(naveControl.getAllHeight() - player.getHeight());
+			 * 
+			 * if (player.getPx() < getPx() || player.getAllWidth() >
+			 * getAllWidth()) { //player.setPx(getPx()); } }
+			 */
+		} else {
+			open = false;
+		}
+
+		if (naveControl.isActive()) {
+
+			/*
+			 * 
+			 * if (stable && getAllHeight() <
+			 * Engine.getIWindowGame().getCanvasHeight()) { incPy(0.05f);
+			 * 
+			 * } else if (getAllHeight() >=
+			 * Engine.getIWindowGame().getCanvasHeight()) { started = false; //
+			 * stable = false; // power = 0f; // System.out.println("solo"); }
+			 */
+
+			/*
+			 * if (!stable && getAllHeight() <
+			 * Engine.getIWindowGame().getCanvasHeight()) { incPy(0.5f); //vel =
+			 * 0; // incPy(0.5f - vel);
+			 * 
+			 * /* if (vel > 0f) vel -= velInc / 2f;// 0.005f; else vel = 0f;
+			 */
+			// }
+		}
+
+	}
+
+	private void processKeyPress() {
+		// only true when naveControl.isActive() is true
+		if (up) {
+			on = true;
+			open = false;
+
+			if (velRise < velRiseMax) {
+				velRise += velRiseInc;
+			}
+
+		} else if (down) {
+
+			if (velRise > velRiseMax * -0.5) {
+				velRise -= velRiseInc;
+			}
+
+		} else if (velRise > RANGE || velRise < -RANGE) {
+			if (velRise > 0f) {
+				velRise -= velRiseInc * 0.5;
+			} else if (velRise < 0f) {
+				velRise += velRiseInc * 0.5;
+			}
+
+		} else {
+			velRise = 0f;
+		}
+
+		boolean collideBottom = collide();
+
+		if (collideBottom && velRise < 0f) {
+			velRise = 0f;
+			on = false;
+			// open = true;
+		}
+
+		if (!collideBottom) {
+			if (lft) {
+				if (vel < velMax) {
+					vel += velInc;
+				}
+
+			} else if (rgt) {
+				// if (vel > -(velMax * 0.5)) {
+				if (vel < velMax) {
+					vel -= velInc;
+				}
+
+			} else if (vel > RANGE || vel < -RANGE) {
+				if (vel > 0.1f) {
+					vel -= velInc * 0.5;
+
+				} else if (vel < 0.1f) {
+					vel += velInc * 0.5;
+
+				}
+
+			} else {
+				vel = 0f;
+			}
+
+		} else if (vel > RANGE || vel < -RANGE) {
+			life--;
 			
-			player.setVisible(!started);
-			
-			if (GraphicTool.g().collide(player, controle) != null) {
-				controle.setVisible(true);
+			if (vel > velInc) {
+				vel -= velInc * 1.5;
+
+			} else if (vel < velInc) {
+				vel += velInc * 1.5;
+			}
+
+		} else {
+			vel = 0f;
+		}
+
+		up = false;
+		down = false;
+		lft = false;
+		rgt = false;
+
+		incPx(-vel);
+		incPy(-velRise);
+	}
+
+	private boolean isFly() {
+		return getAllHeight() < Engine.getIWindowGame().getCanvasHeight();
+	}
+
+	private boolean collide() {
+		return getAllHeight() >= Engine.getIWindowGame().getCanvasHeight();
+	}
+
+	public void _update() {
+		if (player != null) {
+			naveControl.update();
+
+			// TODO state nave estavel
+
+			player.setVisible(!on);
+
+			if (GraphicTool.g().collide(player, naveControl) != null) {
+				naveControl.setVisible(true);
 
 				if (action) {
 
-					if (controle.isActive()) {
+					if (naveControl.isActive()) {
 						// free player
-						player.reposition(isInvert(), controle.getPx(), controle.getAllHeight() - player.getHeight());
+						player.reposition(isInvert(), naveControl.getPx(),
+								naveControl.getAllHeight() - player.getHeight());
 						player.setState(Player.State.DEF);
-						controle.setActive(false);
-						started = false;
+						naveControl.setActive(false);
+						on = false;
 
 					} else {
 						// hold player
 						player.setState(Player.State.IN);
-						controle.setActive(true);
+						naveControl.setActive(true);
 					}
 
 				}
 
 			} else {
-				controle.setVisible(false);
+				naveControl.setVisible(false);
 			}
 
-			if (controle.isActive() || started) {
-				player.reposition(isInvert(), controle.getPx() - 5, controle.getAllHeight() - player.getHeight());
+			if (naveControl.isActive() || on) {
+				player.reposition(isInvert(), naveControl.getPx() - 5, naveControl.getAllHeight() - player.getHeight());
 			}
 		}
 
 		action = false;
-		//Apply gravit
-		if (getAllHeight() < Engine.getIWindowGame().getCanvasHeight()) {
-			incPy(0.5f - vel);
+		// Apply gravit
+		if (!stable && getAllHeight() < Engine.getIWindowGame().getCanvasHeight()) {
+			incPy(0.5f);
+			System.out.println("down");
+			// incPy(0.5f - vel);
 
-			/*if (vel > 0f)
-				vel -= velInc / 2f;// 0.005f;
-			else
-				vel = 0f;*/
+			/*
+			 * if (vel > 0f) vel -= velInc / 2f;// 0.005f; else vel = 0f;
+			 */
 		}
 	}
 
@@ -98,18 +303,34 @@ public class Nave extends ElementModel {
 	public void drawMe(Graphics2D g2d) {
 		SpriteTool s = SpriteTool.s(getImage()).matriz(2, 1);
 
-		if (player != null && !started) {
-
+		if (open) {
 			s.invert(false).draw(g2d, getPx(), getPy(), 1, 0);
-			controle.drawMe(g2d);
+			naveControl.drawMe(g2d);
 
 		} else {
 			s.invert(false).draw(g2d, getPx(), getPy(), 0, 0);
-			
-			if (started) {
+
+			if (on) {
 				s = SpriteTool.s(fogo).matriz(5, 1);
 				s.invert(false).draw(g2d, getPx() + 25, getAllHeight() - 21, SpriteTool.SORT, 0);
-				
+			}
+		}
+	}
+
+	public void _drawMe(Graphics2D g2d) {
+		SpriteTool s = SpriteTool.s(getImage()).matriz(2, 1);
+
+		if (player != null && !on) {
+
+			s.invert(false).draw(g2d, getPx(), getPy(), 1, 0);
+			naveControl.drawMe(g2d);
+
+		} else {
+			s.invert(false).draw(g2d, getPx(), getPy(), 0, 0);
+
+			if (on) {
+				s = SpriteTool.s(fogo).matriz(5, 1);
+				s.invert(false).draw(g2d, getPx() + 25, getAllHeight() - 21, SpriteTool.SORT, 0);
 			}
 		}
 	}
@@ -136,43 +357,34 @@ public class Nave extends ElementModel {
 	}
 
 	public void go(KeysMap direction) {
-		if (player == null || player.getState() != Player.State.IN) {
+		action = false;
+		if (!naveControl.isActive()) {
 			return;
 		}
 
+		// up = direction == KeysMap.UP;
+		// down = direction == KeysMap.DOWN;
+
 		switch (direction) {
 		case UP:
-			up();
+			up = true;
 			break;
 		case DOWN:
-			down();
+			down = true;
 			break;
 		case LEFT:
 			// setDirection(true);
-			incPx(-2);
+			lft = true;
 			break;
 		case RIGHT:
 			// setDirection(false);
-			incPx(+2);
+			rgt = true;
 			break;
 		default:
 			break;
 		}
 
-		update();
+		// update();
 	}
 
-	private void down() {
-		vel -= 0.01f;// incPy(+1);
-	}
-
-	private void up() {
-		started = true;
-		if (vel < velMax) {
-			vel += velInc;
-		}
-
-		incPy(-vel);
-		System.out.println("vel " + vel);
-	}
 }

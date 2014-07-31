@@ -27,7 +27,7 @@ public class Player extends ElementModel {
 
 	@Override
 	public void update() {
-		if (state == State.DEF) {
+		if (state == State.DEF || state == State.IN) {
 			if (dir > 0)
 				dir--;
 		}
@@ -40,7 +40,7 @@ public class Player extends ElementModel {
 			int col = 0;
 			int line = 0;
 
-			if (state == State.DEF) {
+			if (state == State.DEF || state == State.IN) {
 				if (dir == 0) {
 					col = 0;
 
@@ -60,12 +60,11 @@ public class Player extends ElementModel {
 					dir = 0;
 				}
 
-			} else if (state == State.IN) {
+			} else if (state == State.IN_CONTROLLER) {
 				col = 2;
 				line = 1;
 			}
 
-			
 			SpriteTool s = SpriteTool.s(getImage()).matriz(5, 2);
 			// drawBorders(g2d);
 
@@ -98,7 +97,7 @@ public class Player extends ElementModel {
 	}
 
 	public void go(KeysMap direction) {
-		if (getState() == Player.State.IN) {
+		if (getState() == Player.State.IN_CONTROLLER) {
 			return;
 		}
 
@@ -125,8 +124,14 @@ public class Player extends ElementModel {
 	}
 
 	public void reposition(boolean invert, int px, int py) {
-		this.invert = invert;
+		setDirection(invert);
 		setPxy(px, py);
+	}
+
+	public void setNave(Nave n) {
+		if (n == null) {
+			setState(State.DEF);
+		}
 	}
 
 }
