@@ -29,8 +29,7 @@ $RECYCLE.BIN/
 .LSOverride
 
 # Icon must ends with two \r.
-Icon
-
+Icon
 # Thumbnails
 ._*
 
@@ -41,3 +40,5 @@ Icon
 .settings/org.eclipse.jdt.core.prefs
 EntreMundos.7z
 entremundos.jar
+class
+src/br/com/mvbos/jeg
