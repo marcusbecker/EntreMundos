@@ -19,14 +19,68 @@ public class Player extends ElementModel {
 	private boolean invert;
 	private State state = State.DEF;
 
+	private boolean up;
+
+	private boolean down;
+
+	private boolean lft;
+
+	private boolean rgt;
+
+	private int life;
+	private Nave n;
+
 	@Override
 	public void loadElement() {
 		setSize(20, 40);
 		setImage(new ImageIcon(Config.PATH + "p.png"));
 	}
 
+	int inc;
+	int old;
+	
 	@Override
 	public void update() {
+
+		if (getState() == State.IN) {
+			if (lft) {
+				setDirection(true);
+				inc -= 2;
+
+			} else if (rgt) {
+				setDirection(false);
+				inc += 2;
+			}
+
+			//System.out.println("old " + old);
+			if(old != 0){
+				old = old - n.getPx();
+				inc = old;
+				old = 0;
+			}
+			
+			setPx(n.getPx() + inc);
+
+		} else if (getState() == State.IN_CONTROLLER) {
+			old = getPx();
+		} else {
+			if (lft) {
+				setDirection(true);
+				incPx(-2);
+
+			} else if (rgt) {
+				setDirection(false);
+				incPx(+2);
+			}
+			
+			inc = 0;
+		}
+		
+		up = false;
+		down = false;
+		lft = false;
+		rgt = false;
+
 		if (state == State.DEF || state == State.IN) {
 			if (dir > 0)
 				dir--;
@@ -107,12 +161,10 @@ public class Player extends ElementModel {
 		case DOWN:
 			break;
 		case LEFT:
-			setDirection(true);
-			incPx(-2);
+			lft = true;
 			break;
 		case RIGHT:
-			setDirection(false);
-			incPx(+2);
+			rgt = true;
 			break;
 		default:
 			break;
@@ -132,6 +184,8 @@ public class Player extends ElementModel {
 		if (n == null) {
 			setState(State.DEF);
 		}
+
+		this.n = n;
 	}
 
 }

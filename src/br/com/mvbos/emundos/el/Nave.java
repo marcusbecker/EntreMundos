@@ -25,9 +25,9 @@ public class Nave extends ElementModel {
 
 	private float vel;
 
-	private float velMax = 2f;
+	private float velInc = 0.1f;
 
-	private float velInc = 0.08f;
+	private float velMax = 2f;
 
 	private float velRise;
 
@@ -48,8 +48,6 @@ public class Nave extends ElementModel {
 	private boolean up;
 
 	private boolean down;
-
-	private float oldVel;
 
 	private boolean lft;
 
@@ -84,13 +82,14 @@ public class Nave extends ElementModel {
 
 			} else if (player.getState() == Player.State.IN) {
 				open = true;
-				player.setVisible(open);
+				player.setPy(naveControl.getAllHeight() - player.getHeight());
 
 			} else if (player.getState() == Player.State.IN_CONTROLLER) {
-				player.setVisible(open);
 				player.setPxy(naveControl.getPx() - 5, naveControl.getAllHeight() - player.getHeight());
 
 			}
+			
+			player.setVisible(open);
 
 			if (naveControl.isActive() || GraphicTool.g().collide(player, naveControl) != null) {
 
@@ -99,7 +98,7 @@ public class Nave extends ElementModel {
 				if (action) {
 					System.out.println("action");
 					if (naveControl.isActive()) {
-						player.reposition(isInvert(), naveControl.getPx(),
+						player.reposition(isInvert(), player.getPx(),
 								naveControl.getAllHeight() - player.getHeight());
 
 						player.setState(Player.State.IN);
@@ -159,6 +158,7 @@ public class Nave extends ElementModel {
 
 	private void processKeyPress() {
 		// only true when naveControl.isActive() is true
+		
 		if (up) {
 			on = true;
 			open = false;
@@ -168,8 +168,9 @@ public class Nave extends ElementModel {
 			}
 
 		} else if (down) {
-
-			if (velRise > velRiseMax * -0.5) {
+			open = false;
+			// if (velRise > velRiseMax * -0.5) {
+			if (velRise > -velRiseMax) {
 				velRise -= velRiseInc;
 			}
 
@@ -194,11 +195,13 @@ public class Nave extends ElementModel {
 
 		if (!collideBottom) {
 			if (lft) {
+				open = false;
 				if (vel < velMax) {
 					vel += velInc;
 				}
 
 			} else if (rgt) {
+				open = false;
 				// if (vel > -(velMax * 0.5)) {
 				if (vel < velMax) {
 					vel -= velInc;
@@ -219,7 +222,7 @@ public class Nave extends ElementModel {
 
 		} else if (vel > RANGE || vel < -RANGE) {
 			life--;
-			
+
 			if (vel > velInc) {
 				vel -= velInc * 1.5;
 
@@ -248,80 +251,11 @@ public class Nave extends ElementModel {
 		return getAllHeight() >= Engine.getIWindowGame().getCanvasHeight();
 	}
 
-	public void _update() {
-		if (player != null) {
-			naveControl.update();
-
-			// TODO state nave estavel
-
-			player.setVisible(!on);
-
-			if (GraphicTool.g().collide(player, naveControl) != null) {
-				naveControl.setVisible(true);
-
-				if (action) {
-
-					if (naveControl.isActive()) {
-						// free player
-						player.reposition(isInvert(), naveControl.getPx(),
-								naveControl.getAllHeight() - player.getHeight());
-						player.setState(Player.State.DEF);
-						naveControl.setActive(false);
-						on = false;
-
-					} else {
-						// hold player
-						player.setState(Player.State.IN);
-						naveControl.setActive(true);
-					}
-
-				}
-
-			} else {
-				naveControl.setVisible(false);
-			}
-
-			if (naveControl.isActive() || on) {
-				player.reposition(isInvert(), naveControl.getPx() - 5, naveControl.getAllHeight() - player.getHeight());
-			}
-		}
-
-		action = false;
-		// Apply gravit
-		if (!stable && getAllHeight() < Engine.getIWindowGame().getCanvasHeight()) {
-			incPy(0.5f);
-			System.out.println("down");
-			// incPy(0.5f - vel);
-
-			/*
-			 * if (vel > 0f) vel -= velInc / 2f;// 0.005f; else vel = 0f;
-			 */
-		}
-	}
-
 	@Override
 	public void drawMe(Graphics2D g2d) {
 		SpriteTool s = SpriteTool.s(getImage()).matriz(2, 1);
 
 		if (open) {
-			s.invert(false).draw(g2d, getPx(), getPy(), 1, 0);
-			naveControl.drawMe(g2d);
-
-		} else {
-			s.invert(false).draw(g2d, getPx(), getPy(), 0, 0);
-
-			if (on) {
-				s = SpriteTool.s(fogo).matriz(5, 1);
-				s.invert(false).draw(g2d, getPx() + 25, getAllHeight() - 21, SpriteTool.SORT, 0);
-			}
-		}
-	}
-
-	public void _drawMe(Graphics2D g2d) {
-		SpriteTool s = SpriteTool.s(getImage()).matriz(2, 1);
-
-		if (player != null && !on) {
-
 			s.invert(false).draw(g2d, getPx(), getPy(), 1, 0);
 			naveControl.drawMe(g2d);
 
