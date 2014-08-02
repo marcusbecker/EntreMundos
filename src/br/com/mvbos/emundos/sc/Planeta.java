@@ -2,7 +2,6 @@ package br.com.mvbos.emundos.sc;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
-import java.util.Random;
 
 import br.com.mvbos.emundos.el.Bloco;
 import br.com.mvbos.emundos.el.Nave;
@@ -25,9 +24,13 @@ public class Planeta extends SceneDefault {
 	@Override
 	public boolean startScene() {
 		memo = new MemoryImpl(90);
-		Random r = new Random();
-		for (int i = 1; i < 75; i++) {
-			memo.registerElement(new Bloco(450 * i, r.nextInt(250) + 200, 30, 30));
+		for (int i = 1; i < 40; i++) {
+			memo.registerElement(new Bloco(450 * i, 450, 30, 30));
+		}
+		
+		for (int i = 1; i < 40; i++) {
+			int t = Engine.getIWindowGame().getCanvasHeight();
+			memo.registerElement(new Bloco(450, t - (300 * i), 30, 30));
 		}
 
 		memo.registerElement(p);
@@ -52,14 +55,6 @@ public class Planeta extends SceneDefault {
 	public void update() {
 		for (int i = 0; i < memo.getElementCount(); i++) {
 			memo.getByElement(i).update();
-		}
-		
-		
-		for (int i = 0; i < memo.getElementCount(); i++) {
-		
-			if(memo.getByElement(i) != p && GraphicTool.g().collide(n, memo.getByElement(i)) != null){
-				Engine.endGame = true;
-			}
 		}
 	}
 
@@ -90,9 +85,8 @@ public class Planeta extends SceneDefault {
 			}
 		}
 
-		g2d.setColor(Color.BLUE);
-		g2d.drawRect(Engine.getIWindowGame().getWindowWidth() / 2, 0, 1, Engine
-				.getIWindowGame().getWindowHeight());
+		//g2d.setColor(Color.BLUE);
+		//g2d.drawRect(Engine.getIWindowGame().getWindowWidth() / 2, 0, 1, Engine.getIWindowGame().getWindowHeight());
 
 		// AffineTransform old = g2d.getTransform();
 		// AffineTransform tx = AffineTransform.getScaleInstance(-1, 1);

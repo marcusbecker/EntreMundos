@@ -45,6 +45,7 @@ public class Player extends ElementModel {
 	public void update() {
 
 		if (getState() == State.IN) {
+			//TODO controlar no update da nave
 			if (lft) {
 				setDirection(true);
 				inc -= 2;
@@ -54,7 +55,6 @@ public class Player extends ElementModel {
 				inc += 2;
 			}
 
-			// System.out.println("old " + old);
 			if (old != 0) {
 				old = old - n.getPx();
 				inc = old;
@@ -64,28 +64,24 @@ public class Player extends ElementModel {
 			setPx(n.getPx() + inc);
 
 		} else if (getState() == State.IN_CONTROLLER) {
+			//TODO controlar no update da nave
 			old = getPx();
+
 		} else {
 
 			if (lft) {
 				setDirection(true);
-
-				if (getPx() < Engine.getIWindowGame().getCanvasWidth() * 0.5) {
-					Camera.c().rollX(-2);
-					System.out.println(Camera.c());
-				}
-				
-				incPx(-2);
+				inc = -2;
 
 			} else if (rgt) {
 				setDirection(false);
+				inc = +2;
+			}
 
-				if (getAllWidth() - getHalfWidth() > Engine.getIWindowGame().getCanvasWidth() / 2) {
-					Camera.c().rollX(2);
-					System.out.println(Camera.c());
-				}
-				
-				incPx(+2);
+			incPx(inc);
+			if (getAllWidth() - getHalfWidth() > Engine.getIWindowGame().getCanvasWidth() / 2) {
+				Camera.c().rollX(inc);
+				// System.out.println(Camera.c());
 			}
 
 			inc = 0;
@@ -100,6 +96,7 @@ public class Player extends ElementModel {
 			if (dir > 0)
 				dir--;
 		}
+
 	}
 
 	@Override
@@ -137,8 +134,7 @@ public class Player extends ElementModel {
 			SpriteTool s = SpriteTool.s(getImage()).matriz(5, 2);
 			// drawBorders(g2d);
 
-			s.invert(invert).draw(g2d, Camera.c().fx(getPx()),
-					Camera.c().fy(getPy()), col, line);
+			s.invert(invert).draw(g2d, Camera.c().fx(getPx()), Camera.c().fy(getPy()), col, line);
 
 		} else {
 			super.drawMe(g2d);
