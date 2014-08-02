@@ -5,8 +5,6 @@ import java.awt.Graphics2D;
 
 import javax.swing.ImageIcon;
 
-import com.sun.org.glassfish.external.statistics.annotations.Reset;
-
 import br.com.mvbos.emundos.Config;
 import br.com.mvbos.jeg.element.ElementModel;
 import br.com.mvbos.jeg.engine.Engine;
