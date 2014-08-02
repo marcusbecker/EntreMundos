@@ -6,6 +6,7 @@ import java.awt.Graphics2D;
 import javax.swing.ImageIcon;
 
 import br.com.mvbos.emundos.Config;
+import br.com.mvbos.emundos.sc.Planeta;
 import br.com.mvbos.jeg.element.ElementModel;
 import br.com.mvbos.jeg.engine.Engine;
 import br.com.mvbos.jeg.engine.GraphicTool;
@@ -151,7 +152,13 @@ public class Nave extends ElementModel {
 				Camera.c().rollX(-_vel);
 			}
 
-			if (getPy() - getHalfHeight() < Engine.getIWindowGame().getCanvasHeight() / 2) {
+			/*
+			 * if (getPy() - getHalfHeight() <
+			 * Engine.getIWindowGame().getCanvasHeight() / 2) {
+			 * Camera.c().rollY(-velRise); }
+			 */
+
+			if (getPy() - getHalfHeight() < Camera.c().getCpy() + getHeight()) {
 				Camera.c().rollY(-velRise);
 			}
 
@@ -159,36 +166,40 @@ public class Nave extends ElementModel {
 			open = false;
 		}
 
+		System.out.println(getPy());
+		System.out.println(Camera.c().getCpy());
+
 		bar.setDamage(damage);
 		bar.update();
 		bar.setVisible(player != null);
 
+		// TODO criar wrap util:
+		if (getPx() < 0) {
+			setPx(0);
+			_vel = 0;
+		} else if (getAllWidth() > Planeta.w) {
+			setPx(Planeta.w - getAllWidth());
+			_vel = 0;
+		}
+
+		if (getPy() < 0) {
+			setPy(0);
+			velRise = 0;
+		} else if (getAllHeight() > Planeta.h) {
+			setPy(Planeta.h - getAllHeight());
+			velRise = 0;
+		}
+
+		//------------------------------
+		
 		if (naveControl.isActive()) {
-
-			/*
-			 * 
-			 * if (stable && getAllHeight() <
-			 * Engine.getIWindowGame().getCanvasHeight()) { incPy(0.05f);
-			 * 
-			 * } else if (getAllHeight() >=
-			 * Engine.getIWindowGame().getCanvasHeight()) { started = false; //
-			 * stable = false; // power = 0f; // System.out.println("solo"); }
-			 */
-
-			/*
-			 * if (!stable && getAllHeight() <
-			 * Engine.getIWindowGame().getCanvasHeight()) { incPy(0.5f); //vel =
-			 * 0; // incPy(0.5f - vel);
-			 * 
-			 * /* if (vel > 0f) vel -= velInc / 2f;// 0.005f; else vel = 0f;
-			 */
-			// }
 		}
 
-		if (getAllHeight() >= Engine.getIWindowGame().getCanvasHeight()) {
-			setPy(Engine.getIWindowGame().getCanvasHeight() - getHeight());
-			Camera.c().setCpy(0);
-		}
+		/*
+		 * if (getAllHeight() >= Engine.getIWindowGame().getCanvasHeight()) {
+		 * setPy(Engine.getIWindowGame().getCanvasHeight() - getHeight());
+		 * Camera.c().setCpy(0); }
+		 */
 	}
 
 	private void releaseControll() {
@@ -243,11 +254,6 @@ public class Nave extends ElementModel {
 				if (_vel < velMax) {
 					_vel += velInc;
 				}
-
-				/*
-				 * if (getPx() < Engine.getIWindowGame().getCanvasWidth() * 0.5)
-				 * { Camera.c().rollX(vel); }
-				 */
 
 			} else if (naveControl.isActive() && rgt) {
 				open = false;
@@ -337,7 +343,7 @@ public class Nave extends ElementModel {
 	}
 
 	private boolean collide() {
-		return getAllHeight() >= Engine.getIWindowGame().getCanvasHeight();
+		return getAllHeight() >= Planeta.h;
 	}
 
 	@Override

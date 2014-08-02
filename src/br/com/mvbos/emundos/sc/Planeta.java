@@ -3,6 +3,9 @@ package br.com.mvbos.emundos.sc;
 import java.awt.Color;
 import java.awt.Graphics2D;
 
+import javax.swing.ImageIcon;
+
+import br.com.mvbos.emundos.Config;
 import br.com.mvbos.emundos.el.Bloco;
 import br.com.mvbos.emundos.el.Nave;
 import br.com.mvbos.emundos.el.Player;
@@ -10,6 +13,7 @@ import br.com.mvbos.jeg.engine.Engine;
 import br.com.mvbos.jeg.engine.GraphicTool;
 import br.com.mvbos.jeg.engine.KeysMap;
 import br.com.mvbos.jeg.scene.impl.SceneDefault;
+import br.com.mvbos.jeg.window.Camera;
 import br.com.mvbos.jeg.window.impl.MemoryImpl;
 
 public class Planeta extends SceneDefault {
@@ -21,16 +25,20 @@ public class Planeta extends SceneDefault {
 
 	private int[] keys = { 38, 40, 37, 39 };// cima, baixo, esq, dir
 
+	private ImageIcon bg;
+	
+	public static int w = 3970;
+	public static int h = 3970;
+
 	@Override
 	public boolean startScene() {
 		memo = new MemoryImpl(90);
 		for (int i = 1; i < 40; i++) {
-			memo.registerElement(new Bloco(450 * i, 450, 30, 30));
+			memo.registerElement(new Bloco(450 * i, Planeta.h - 450, 30, 30));
 		}
-		
+
 		for (int i = 1; i < 40; i++) {
-			int t = Engine.getIWindowGame().getCanvasHeight();
-			memo.registerElement(new Bloco(450, t - (300 * i), 30, 30));
+			memo.registerElement(new Bloco(450, Planeta.h - (300 * i), 30, 30));
 		}
 
 		memo.registerElement(p);
@@ -43,6 +51,16 @@ public class Planeta extends SceneDefault {
 		resizeWindow();
 
 		Engine.endGame = false;
+
+		bg = new ImageIcon(Config.PATH + "bg_space.png");
+		
+		
+		p.setPy(Planeta.h - 40);
+		n.setPy(Planeta.h - 60);
+		
+		Camera.c().rollY(Planeta.h - Engine.getIWindowGame().getCanvasHeight());
+		//System.out.println(Camera.c());
+
 		return true;
 	}
 
@@ -60,20 +78,25 @@ public class Planeta extends SceneDefault {
 
 	@Override
 	public void resizeWindow() {
-		p.setPy(Engine.getIWindowGame().getCanvasHeight() - 40);
-		n.setPy(Engine.getIWindowGame().getCanvasHeight() - 60);
+		//TODO reajuste camera
+		//p.setPy(Engine.getIWindowGame().getCanvasHeight() - 40);
+		//n.setPy(Engine.getIWindowGame().getCanvasHeight() - 60);
 	}
 
 	@Override
 	public void drawElements(Graphics2D g2d) {
-		
-		if(Engine.endGame){
+
+		if (bg != null) {
+			g2d.drawImage(bg.getImage(), 0, (int) -Camera.c().getCpy(), Engine.getIWindowGame().getWindowWidth(), 3970, null);
+		}
+
+		if (Engine.endGame) {
 			g2d.setColor(Color.BLUE);
 			g2d.drawString("GAME OVER", 300, 300);
-			
+
 			return;
 		}
-		
+
 		if (memo == null) {
 			Engine.log("Draw Error: Scene don't started.");
 			return;
@@ -85,8 +108,9 @@ public class Planeta extends SceneDefault {
 			}
 		}
 
-		//g2d.setColor(Color.BLUE);
-		//g2d.drawRect(Engine.getIWindowGame().getWindowWidth() / 2, 0, 1, Engine.getIWindowGame().getWindowHeight());
+		// g2d.setColor(Color.BLUE);
+		// g2d.drawRect(Engine.getIWindowGame().getWindowWidth() / 2, 0, 1,
+		// Engine.getIWindowGame().getWindowHeight());
 
 		// AffineTransform old = g2d.getTransform();
 		// AffineTransform tx = AffineTransform.getScaleInstance(-1, 1);
