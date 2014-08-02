@@ -2,7 +2,9 @@ package br.com.mvbos.emundos.sc;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.util.Random;
 
+import br.com.mvbos.emundos.el.Bloco;
 import br.com.mvbos.emundos.el.Nave;
 import br.com.mvbos.emundos.el.Player;
 import br.com.mvbos.jeg.engine.Engine;
@@ -12,8 +14,9 @@ import br.com.mvbos.jeg.scene.impl.SceneDefault;
 import br.com.mvbos.jeg.window.impl.MemoryImpl;
 
 public class Planeta extends SceneDefault {
-	
+
 	private static final GraphicTool G = GraphicTool.g();
+
 	private Player p = new Player();
 	private Nave n = new Nave();
 
@@ -21,7 +24,11 @@ public class Planeta extends SceneDefault {
 
 	@Override
 	public boolean startScene() {
-		memo = new MemoryImpl(30);
+		memo = new MemoryImpl(90);
+		Random r = new Random();
+		for (int i = 1; i < 75; i++) {
+			memo.registerElement(new Bloco(450 * i, r.nextInt(250) + 200, 30, 30));
+		}
 
 		memo.registerElement(p);
 		memo.registerElement(n);
@@ -31,7 +38,8 @@ public class Planeta extends SceneDefault {
 		}
 
 		resizeWindow();
-		
+
+		Engine.endGame = false;
 		return true;
 	}
 
@@ -44,7 +52,15 @@ public class Planeta extends SceneDefault {
 	public void update() {
 		for (int i = 0; i < memo.getElementCount(); i++) {
 			memo.getByElement(i).update();
-		}		
+		}
+		
+		
+		for (int i = 0; i < memo.getElementCount(); i++) {
+		
+			if(memo.getByElement(i) != p && GraphicTool.g().collide(n, memo.getByElement(i)) != null){
+				Engine.endGame = true;
+			}
+		}
 	}
 
 	@Override
@@ -55,6 +71,14 @@ public class Planeta extends SceneDefault {
 
 	@Override
 	public void drawElements(Graphics2D g2d) {
+		
+		if(Engine.endGame){
+			g2d.setColor(Color.BLUE);
+			g2d.drawString("GAME OVER", 300, 300);
+			
+			return;
+		}
+		
 		if (memo == null) {
 			Engine.log("Draw Error: Scene don't started.");
 			return;
@@ -65,51 +89,67 @@ public class Planeta extends SceneDefault {
 				memo.getByElement(i).drawMe(g2d);
 			}
 		}
-		
-		
-		//AffineTransform old = g2d.getTransform();
-		//AffineTransform tx = AffineTransform.getScaleInstance(-1, 1);
-		//g2d.setTransform(tx);
+
+		g2d.setColor(Color.BLUE);
+		g2d.drawRect(Engine.getIWindowGame().getWindowWidth() / 2, 0, 1, Engine
+				.getIWindowGame().getWindowHeight());
+
+		// AffineTransform old = g2d.getTransform();
+		// AffineTransform tx = AffineTransform.getScaleInstance(-1, 1);
+		// g2d.setTransform(tx);
 	}
 
 	@Override
 	public void keyEvent(char keyChar, int keyCode) {
 		if (keyCode == keys[0]) {
 			p.go(KeysMap.UP);
-			n.go(KeysMap.UP);
-			
+			n.press(KeysMap.UP);
+
 		} else if (keyCode == keys[1]) {
 			p.go(KeysMap.DOWN);
-			n.go(KeysMap.DOWN);
-			
+			n.press(KeysMap.DOWN);
+
 		} else if (keyCode == keys[2]) {
 			p.go(KeysMap.LEFT);
-			n.go(KeysMap.LEFT);
+			n.press(KeysMap.LEFT);
 
 		} else if (keyCode == keys[3]) {
 			p.go(KeysMap.RIGHT);
-			n.go(KeysMap.RIGHT);
+			n.press(KeysMap.RIGHT);
 
-		} else /*if (keyCode == keys[4])*/ {
+		} else /* if (keyCode == keys[4]) */{
 			p.action();
-			n.action();			
+			n.action();
 		}
-		
-		//n.setInside(G.collide(p, n) != null);
-		
+
+		// n.setInside(G.collide(p, n) != null);
+
 		if (G.collide(p, n) != null) {
 			n.setPlayer(p);
 			p.setNave(n);
-			
+
 		} else {
 			n.setPlayer(null);
 			p.setNave(null);
 		}
 	}
-	
+
 	@Override
 	public void keyRelease(char keyChar, int keyCode) {
 		p.stop();
+
+		if (keyCode == keys[0]) {
+			n.release(KeysMap.UP);
+
+		} else if (keyCode == keys[1]) {
+			n.release(KeysMap.DOWN);
+
+		} else if (keyCode == keys[2]) {
+			n.release(KeysMap.LEFT);
+
+		} else if (keyCode == keys[3]) {
+			n.release(KeysMap.RIGHT);
+
+		}
 	}
 }
-

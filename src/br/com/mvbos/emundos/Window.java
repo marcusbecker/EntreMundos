@@ -88,12 +88,13 @@ public class Window extends JFrame implements IWindowGame {
 
 			@Override
 			public void keyTyped(KeyEvent e) {
-				// TODO Auto-generated method stub
 			}
 
 			@Override
 			public void keyReleased(KeyEvent e) {
-				scene.keyRelease(e.getKeyChar(), e.getKeyCode());
+				if (scene != null) {
+					scene.keyRelease(e.getKeyChar(), e.getKeyCode());
+				}
 			}
 
 			@Override
@@ -216,7 +217,7 @@ public class Window extends JFrame implements IWindowGame {
 	public static void main(String[] args) {
 		Window game = new Window();
 		game.init();
-		// game.changeScene(new SceneDefault());
+		//game.changeScene(new SceneDefault());
 		game.changeScene(new Planeta());
 	}
 

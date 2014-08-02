@@ -6,8 +6,10 @@ import javax.swing.ImageIcon;
 
 import br.com.mvbos.emundos.Config;
 import br.com.mvbos.jeg.element.ElementModel;
+import br.com.mvbos.jeg.engine.Engine;
 import br.com.mvbos.jeg.engine.KeysMap;
 import br.com.mvbos.jeg.engine.SpriteTool;
+import br.com.mvbos.jeg.window.Camera;
 
 public class Player extends ElementModel {
 
@@ -38,7 +40,7 @@ public class Player extends ElementModel {
 
 	int inc;
 	int old;
-	
+
 	@Override
 	public void update() {
 
@@ -52,30 +54,43 @@ public class Player extends ElementModel {
 				inc += 2;
 			}
 
-			//System.out.println("old " + old);
-			if(old != 0){
+			// System.out.println("old " + old);
+			if (old != 0) {
 				old = old - n.getPx();
 				inc = old;
 				old = 0;
 			}
-			
+
 			setPx(n.getPx() + inc);
 
 		} else if (getState() == State.IN_CONTROLLER) {
 			old = getPx();
 		} else {
+
 			if (lft) {
 				setDirection(true);
+
+				if (getPx() < Engine.getIWindowGame().getCanvasWidth() * 0.5) {
+					Camera.c().rollX(-2);
+					System.out.println(Camera.c());
+				}
+				
 				incPx(-2);
 
 			} else if (rgt) {
 				setDirection(false);
+
+				if (getAllWidth() - getHalfWidth() > Engine.getIWindowGame().getCanvasWidth() / 2) {
+					Camera.c().rollX(2);
+					System.out.println(Camera.c());
+				}
+				
 				incPx(+2);
 			}
-			
+
 			inc = 0;
 		}
-		
+
 		up = false;
 		down = false;
 		lft = false;
@@ -122,7 +137,8 @@ public class Player extends ElementModel {
 			SpriteTool s = SpriteTool.s(getImage()).matriz(5, 2);
 			// drawBorders(g2d);
 
-			s.invert(invert).draw(g2d, getPx(), getPy(), col, line);
+			s.invert(invert).draw(g2d, Camera.c().fx(getPx()),
+					Camera.c().fy(getPy()), col, line);
 
 		} else {
 			super.drawMe(g2d);
