@@ -5,6 +5,8 @@ import java.awt.Graphics2D;
 
 import javax.swing.ImageIcon;
 
+import com.sun.org.glassfish.external.statistics.annotations.Reset;
+
 import br.com.mvbos.emundos.Config;
 import br.com.mvbos.jeg.element.ElementModel;
 import br.com.mvbos.jeg.engine.Engine;
@@ -15,11 +17,18 @@ import br.com.mvbos.jeg.window.Camera;
 
 public class Nave extends ElementModel {
 
+	private static final int RISE_LIMIT = 2600;
+
+	private static final int GRAVITY = 50;
+
 	private static final float RANGE = 0.1f;
+
+	private static final int MAX_DAMAGE = 100;
 
 	private Player player;
 
 	private Menu naveControl;
+	private BarraStatus bar;
 
 	private boolean action;
 
@@ -33,7 +42,7 @@ public class Nave extends ElementModel {
 
 	private float velRise;
 
-	private float velRiseMax = 1.5f;
+	private float velRiseMax = 6f;// 1.5f;
 
 	private float velRiseInc = 0.02f;
 
@@ -55,7 +64,7 @@ public class Nave extends ElementModel {
 
 	private boolean rgt;
 
-	private int life;
+	private int damage;
 
 	@Override
 	public void loadElement() {
@@ -66,6 +75,8 @@ public class Nave extends ElementModel {
 
 		naveControl = new Menu(0, 0, 10, 10);
 		naveControl.setNave(this);
+
+		bar = new BarraStatus(Engine.getIWindowGame().getCanvasWidth() - 110, 10, 100, 15);
 	}
 
 	@Override
@@ -73,6 +84,10 @@ public class Nave extends ElementModel {
 
 		keyUpdateShip();
 		keyUpdatePlayer();
+
+		if (getPy() < -RISE_LIMIT) {
+			incDamage();
+		}
 
 		naveControl.update();
 
@@ -146,6 +161,10 @@ public class Nave extends ElementModel {
 			open = false;
 		}
 
+		bar.setDamage(damage);
+		bar.update();
+		bar.setVisible(player != null);
+
 		if (naveControl.isActive()) {
 
 			/*
@@ -167,6 +186,11 @@ public class Nave extends ElementModel {
 			 */
 			// }
 		}
+
+		if (getAllHeight() >= Engine.getIWindowGame().getCanvasHeight()) {
+			setPy(Engine.getIWindowGame().getCanvasHeight() - getHeight());
+			Camera.c().setCpy(0);
+		}
 	}
 
 	private void releaseControll() {
@@ -179,29 +203,32 @@ public class Nave extends ElementModel {
 
 	private void keyUpdateShip() {
 
-		if (naveControl.isActive() && up) {
-			on = true;
-			open = false;
+		if (damage < MAX_DAMAGE) {
+			if (naveControl.isActive() && up) {
+				open = false;
+				on = true;
 
-			if (velRise < velRiseMax) {
-				velRise += velRiseInc;
+				if (velRise < velRiseMax) {
+					velRise += velRiseInc;
+				}
+
+			} else if (naveControl.isActive() && down) {
+				open = false;
+				if (velRise > -velRiseMax) {
+					velRise -= velRiseInc;
+				}
+
+			} else if (velRise > RANGE || velRise < -RANGE) {
+				if (velRise > 0f) {
+					velRise -= velRiseInc * 0.5;
+				} else if (velRise < 0f) {
+					velRise += velRiseInc * 0.5;
+				}
+
+			} else {
+				velRise = 0f;
 			}
 
-		} else if (naveControl.isActive() && down) {
-			open = false;
-			if (velRise > -velRiseMax) {
-				velRise -= velRiseInc;
-			}
-
-		} else if (velRise > RANGE || velRise < -RANGE) {
-			if (velRise > 0f) {
-				velRise -= velRiseInc * 0.5;
-			} else if (velRise < 0f) {
-				velRise += velRiseInc * 0.5;
-			}
-
-		} else {
-			velRise = 0f;
 		}
 
 		boolean collideBottom = collide();
@@ -243,8 +270,15 @@ public class Nave extends ElementModel {
 				_vel = 0f;
 			}
 
+			if (damage >= MAX_DAMAGE) {
+				on = false;
+				if (velRise > -GRAVITY) {
+					velRise -= velRiseInc * 2;
+				}
+			}
+
 		} else if (_vel > RANGE || _vel < -RANGE) {
-			life--;
+			incDamage();
 
 			if (_vel > velInc) {
 				_vel -= velInc * 2;
@@ -263,6 +297,16 @@ public class Nave extends ElementModel {
 
 		incPx(-_vel);
 		incPy(-velRise);
+	}
+
+	private void incDamage() {
+		if (++damage > MAX_DAMAGE) {
+			damage = MAX_DAMAGE;
+		}
+	}
+
+	private void fix() {
+		damage = 0;
 	}
 
 	private void keyUpdatePlayer() {
@@ -316,10 +360,12 @@ public class Nave extends ElementModel {
 			}
 		}
 
+		bar.drawMe(g2d);
+
 		g2d.setColor(Color.BLACK);
-		g2d.drawString("Life: " + life, 10, 15);
+		g2d.drawString("Rise: " + velRise, 10, 15);
 		g2d.drawString("Vel: " + _vel, 10, 25);
-		g2d.drawString("Vel Mx: " + velMax, 10, 45);
+		g2d.drawString("Py: " + getPy(), 10, 45);
 	}
 
 	public Player getPlayer() {

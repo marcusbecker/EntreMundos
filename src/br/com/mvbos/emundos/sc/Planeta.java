@@ -48,7 +48,7 @@ public class Planeta extends SceneDefault {
 
 	@Override
 	public Color getBgColor() {
-		return Color.WHITE;
+		return Color.ORANGE;
 	}
 
 	@Override
