@@ -25,7 +25,7 @@ public class Nave extends ElementModel {
 
 	private boolean invert;
 
-	private float vel;
+	private float _vel;
 
 	private float velInc = 0.1f;
 
@@ -71,9 +71,8 @@ public class Nave extends ElementModel {
 	@Override
 	public void update() {
 
-		processKeyPress();
-
-		// open = player != null && !on;
+		keyUpdateShip();
+		keyUpdatePlayer();
 
 		naveControl.update();
 
@@ -87,33 +86,25 @@ public class Nave extends ElementModel {
 				player.setPy(naveControl.getAllHeight() - player.getHeight());
 
 			} else if (player.getState() == Player.State.IN_CONTROLLER) {
-				player.setPxy(naveControl.getPx() - 5,
-						naveControl.getAllHeight() - player.getHeight());
+				player.setPxy(naveControl.getPx() - 5, naveControl.getAllHeight() - player.getHeight());
 
 			}
 
 			player.setVisible(open);
 
-			if (naveControl.isActive()
-					|| GraphicTool.g().collide(player, naveControl) != null) {
+			if (naveControl.isActive() || GraphicTool.g().collide(player, naveControl) != null) {
 
-				naveControl
-						.setVisible(player.getState() != Player.State.IN_CONTROLLER);
+				naveControl.setVisible(player.getState() != Player.State.IN_CONTROLLER);
 
 				if (action) {
 
 					if (naveControl.isActive()) {
-						player.reposition(isInvert(), player.getPx(),
-								naveControl.getAllHeight() - player.getHeight());
+						player.reposition(isInvert(), player.getPx(), naveControl.getAllHeight() - player.getHeight());
 
 						player.setState(Player.State.IN);
 						naveControl.setActive(false);
-						
-						//release controllers
-						up = false;
-						down = false;
-						lft = false;
-						rgt = false;						
+
+						releaseControll();
 
 					} else {
 						player.reposition(isInvert(), naveControl.getPx() - 5,
@@ -121,6 +112,8 @@ public class Nave extends ElementModel {
 
 						player.setState(Player.State.IN_CONTROLLER);
 						naveControl.setActive(true);
+
+						releaseControll();
 					}
 
 				} else {
@@ -139,6 +132,16 @@ public class Nave extends ElementModel {
 			 * if (player.getPx() < getPx() || player.getAllWidth() >
 			 * getAllWidth()) { //player.setPx(getPx()); } }
 			 */
+
+			// update camera
+			if (getAllWidth() - getHalfWidth() > Engine.getIWindowGame().getCanvasWidth() / 2) {
+				Camera.c().rollX(-_vel);
+			}
+
+			if (getPy() - getHalfHeight() < Engine.getIWindowGame().getCanvasHeight() / 2) {
+				Camera.c().rollY(-velRise);
+			}
+
 		} else {
 			open = false;
 		}
@@ -164,21 +167,19 @@ public class Nave extends ElementModel {
 			 */
 			// }
 		}
-
-		if (getAllWidth() - getHalfWidth() > Engine.getIWindowGame().getCanvasWidth() / 2) {
-			Camera.c().rollX(-vel);
-		}
-		
-		if (getPy() - getHalfHeight() < Engine.getIWindowGame().getCanvasHeight() / 2) {
-			Camera.c().rollY(-velRise);
-		}
-
 	}
 
-	private void processKeyPress() {
-		// only true when naveControl.isActive() is true
+	private void releaseControll() {
+		// release controllers
+		up = false;
+		down = false;
+		lft = false;
+		rgt = false;
+	}
 
-		if (up) {
+	private void keyUpdateShip() {
+
+		if (naveControl.isActive() && up) {
 			on = true;
 			open = false;
 
@@ -186,7 +187,7 @@ public class Nave extends ElementModel {
 				velRise += velRiseInc;
 			}
 
-		} else if (down) {
+		} else if (naveControl.isActive() && down) {
 			open = false;
 			if (velRise > -velRiseMax) {
 				velRise -= velRiseInc;
@@ -212,10 +213,10 @@ public class Nave extends ElementModel {
 		}
 
 		if (!collideBottom) {
-			if (lft) {
+			if (naveControl.isActive() && lft) {
 				open = false;
-				if (vel < velMax) {
-					vel += velInc;
+				if (_vel < velMax) {
+					_vel += velInc;
 				}
 
 				/*
@@ -223,45 +224,70 @@ public class Nave extends ElementModel {
 				 * { Camera.c().rollX(vel); }
 				 */
 
-			} else if (rgt) {
+			} else if (naveControl.isActive() && rgt) {
 				open = false;
-				if (vel > -velMax) {
-					vel -= velInc;
+				if (_vel > -velMax) {
+					_vel -= velInc;
 				}
 
-			} else if (vel > RANGE || vel < -RANGE) {
-				if (vel > 0.1f) {
-					vel -= velInc * 0.5;
+			} else if (_vel > RANGE || _vel < -RANGE) {
+				if (_vel > 0.1f) {
+					_vel -= velInc * 0.5;
 
-				} else if (vel < 0.1f) {
-					vel += velInc * 0.5;
+				} else if (_vel < 0.1f) {
+					_vel += velInc * 0.5;
 
 				}
 
 			} else {
-				vel = 0f;
+				_vel = 0f;
 			}
 
-		} else if (vel > RANGE || vel < -RANGE) {
+		} else if (_vel > RANGE || _vel < -RANGE) {
 			life--;
 
-			if (vel > velInc) {
-				vel -= velInc * 2;
+			if (_vel > velInc) {
+				_vel -= velInc * 2;
 
-			} else if (vel < velInc) {
-				vel += velInc * 2;
+			} else if (_vel < velInc) {
+				_vel += velInc * 2;
 			}
 
 		} else {
-			vel = 0f;
+			_vel = 0f;
 		}
 
 		/*
 		 * up = false; down = false; lft = false; rgt = false;
 		 */
 
-		incPx(-vel);
+		incPx(-_vel);
 		incPy(-velRise);
+	}
+
+	private void keyUpdatePlayer() {
+		if (player == null || player.getState() != Player.State.IN) {
+			return;
+		}
+
+		player.incPx(-_vel);
+		// player.incPy(-velRise);
+
+		if (up) {
+
+		} else if (down) {
+
+		}
+
+		if (lft) {
+			player.moveX(-player.velInc);
+
+		} else if (rgt) {
+			player.moveX(player.velInc);
+		}
+
+		releaseControll();
+
 	}
 
 	private boolean isFly() {
@@ -277,24 +303,22 @@ public class Nave extends ElementModel {
 		SpriteTool s = SpriteTool.s(getImage()).matriz(2, 1);
 
 		if (open) {
-			s.invert(false).draw(g2d, Camera.c().fx(getPx()),
-					Camera.c().fy(getPy()), 1, 0);
+			s.invert(false).draw(g2d, Camera.c().fx(getPx()), Camera.c().fy(getPy()), 1, 0);
 			naveControl.drawMe(g2d);
 
 		} else {
-			s.invert(false).draw(g2d, Camera.c().fx(getPx()),
-					Camera.c().fy(getPy()), 0, 0);
+			s.invert(false).draw(g2d, Camera.c().fx(getPx()), Camera.c().fy(getPy()), 0, 0);
 
 			if (on) {
 				s = SpriteTool.s(fogo).matriz(5, 1);
-				s.invert(false).draw(g2d, Camera.c().fx(getPx()) + 25,
-						Camera.c().fy(getAllHeight() - 21), SpriteTool.SORT, 0);
+				s.invert(false).draw(g2d, Camera.c().fx(getPx()) + 25, Camera.c().fy(getAllHeight() - 21),
+						SpriteTool.SORT, 0);
 			}
 		}
-		
+
 		g2d.setColor(Color.BLACK);
 		g2d.drawString("Life: " + life, 10, 15);
-		g2d.drawString("Vel: " + vel, 10, 25);
+		g2d.drawString("Vel: " + _vel, 10, 25);
 		g2d.drawString("Vel Mx: " + velMax, 10, 45);
 	}
 
@@ -321,22 +345,23 @@ public class Nave extends ElementModel {
 
 	public void press(KeysMap direction) {
 		action = false;
-		if (!naveControl.isActive()) {
-			return;
-		}
 
 		switch (direction) {
 		case UP:
 			up = true;
+			down = false;
 			break;
 		case DOWN:
 			down = true;
+			up = false;
 			break;
 		case LEFT:
 			lft = true;
+			rgt = false;
 			break;
 		case RIGHT:
 			rgt = true;
+			lft = false;
 			break;
 		default:
 			break;

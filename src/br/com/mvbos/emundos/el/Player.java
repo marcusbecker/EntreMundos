@@ -32,59 +32,35 @@ public class Player extends ElementModel {
 	private int life;
 	private Nave n;
 
+	public int velInc = 2;
+
 	@Override
 	public void loadElement() {
 		setSize(20, 40);
 		setImage(new ImageIcon(Config.PATH + "p.png"));
 	}
 
-	int inc;
-	int old;
-
 	@Override
 	public void update() {
 
 		if (getState() == State.IN) {
-			//TODO controlar no update da nave
-			if (lft) {
-				setDirection(true);
-				inc -= 2;
-
-			} else if (rgt) {
-				setDirection(false);
-				inc += 2;
-			}
-
-			if (old != 0) {
-				old = old - n.getPx();
-				inc = old;
-				old = 0;
-			}
-
-			setPx(n.getPx() + inc);
 
 		} else if (getState() == State.IN_CONTROLLER) {
-			//TODO controlar no update da nave
-			old = getPx();
 
 		} else {
 
 			if (lft) {
-				setDirection(true);
-				inc = -2;
+				moveX(-velInc);
 
 			} else if (rgt) {
-				setDirection(false);
-				inc = +2;
+				moveX(velInc);
 			}
 
-			incPx(inc);
-			if (getAllWidth() - getHalfWidth() > Engine.getIWindowGame().getCanvasWidth() / 2) {
-				Camera.c().rollX(inc);
-				// System.out.println(Camera.c());
+			if (lft || rgt) {
+				if (getAllWidth() - getHalfWidth() > Engine.getIWindowGame().getCanvasWidth() / 2) {
+					Camera.c().rollX(lft ? -velInc : velInc);
+				}
 			}
-
-			inc = 0;
 		}
 
 		up = false;
@@ -97,6 +73,11 @@ public class Player extends ElementModel {
 				dir--;
 		}
 
+	}
+
+	public void moveX(int inc) {
+		setDirection(inc < 0);
+		incPx(inc);
 	}
 
 	@Override
@@ -132,7 +113,6 @@ public class Player extends ElementModel {
 			}
 
 			SpriteTool s = SpriteTool.s(getImage()).matriz(5, 2);
-			// drawBorders(g2d);
 
 			s.invert(invert).draw(g2d, Camera.c().fx(getPx()), Camera.c().fy(getPy()), col, line);
 

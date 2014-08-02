@@ -13,10 +13,9 @@ public class Menu extends ElementModel {
 
 	@Override
 	public void drawMe(Graphics2D g2d) {
-		drawBorders(g2d);
 		if (isVisible() && !isActive()) {
 			g2d.setColor(Color.BLUE);
-			
+
 			g2d.fillRect(Camera.c().fx(getPx() + 5), Camera.c().fy(nave.getPy() - 150), 100, 100);
 
 			g2d.setColor(Color.WHITE);
