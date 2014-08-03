@@ -55,12 +55,6 @@ public class Player extends ElementModel {
 			} else if (rgt) {
 				moveX(velInc);
 			}
-
-			if (lft || rgt) {
-				if (getAllWidth() - getHalfWidth() > Engine.getIWindowGame().getCanvasWidth() / 2) {
-					Camera.c().rollX(lft ? -velInc : velInc);
-				}
-			}
 		}
 
 		up = false;
@@ -72,6 +66,9 @@ public class Player extends ElementModel {
 			if (dir > 0)
 				dir--;
 		}
+		
+		// update camera
+		Camera.c().center(this);
 
 	}
 

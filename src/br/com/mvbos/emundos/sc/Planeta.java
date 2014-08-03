@@ -58,7 +58,7 @@ public class Planeta extends SceneDefault {
 		p.setPy(Planeta.h - 40);
 		n.setPy(Planeta.h - 60);
 		
-		Camera.c().rollY(Planeta.h - Engine.getIWindowGame().getCanvasHeight());
+		Camera.c().config(w, h).rollY(Planeta.h - Engine.getIWindowGame().getCanvasHeight());
 		//System.out.println(Camera.c());
 
 		return true;

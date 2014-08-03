@@ -16,7 +16,7 @@ import br.com.mvbos.jeg.window.Camera;
 
 public class Nave extends ElementModel {
 
-	private static final int RISE_LIMIT = 2600;
+	private static final int RISE_LIMIT = 1600;
 
 	private static final int GRAVITY = 50;
 
@@ -84,8 +84,11 @@ public class Nave extends ElementModel {
 		keyUpdateShip();
 		keyUpdatePlayer();
 
-		if (getPy() < -RISE_LIMIT) {
-			incDamage();
+		if (getPy() < RISE_LIMIT) {
+			// incDamage();
+			// setPy(RISE_LIMIT);
+			// velRise = -velRiseMax * 0.2f;//kick
+
 		}
 
 		naveControl.update();
@@ -131,43 +134,18 @@ public class Nave extends ElementModel {
 					}
 
 				} else {
-					// player.reposition(isInvert(), naveControl.getPx(),
-					// naveControl.getAllHeight() - player.getHeight());
 				}
 
 				action = false;
 
 			}
 
-			/*
-			 * if (player.getState() != Player.State.DEF) {
-			 * player.setPy(naveControl.getAllHeight() - player.getHeight());
-			 * 
-			 * if (player.getPx() < getPx() || player.getAllWidth() >
-			 * getAllWidth()) { //player.setPx(getPx()); } }
-			 */
-
 			// update camera
-			if (getAllWidth() - getHalfWidth() > Engine.getIWindowGame().getCanvasWidth() / 2) {
-				Camera.c().rollX(-_vel);
-			}
-
-			/*
-			 * if (getPy() - getHalfHeight() <
-			 * Engine.getIWindowGame().getCanvasHeight() / 2) {
-			 * Camera.c().rollY(-velRise); }
-			 */
-
-			if (getPy() - getHalfHeight() < Camera.c().getCpy() + getHeight()) {
-				Camera.c().rollY(-velRise);
-			}
+			Camera.c().center(this);
 
 		} else {
 			open = false;
 		}
-
-		System.out.println(getPy());
-		System.out.println(Camera.c().getCpy());
 
 		bar.setDamage(damage);
 		bar.update();
@@ -177,21 +155,21 @@ public class Nave extends ElementModel {
 		if (getPx() < 0) {
 			setPx(0);
 			_vel = 0;
+
 		} else if (getAllWidth() > Planeta.w) {
-			setPx(Planeta.w - getAllWidth());
+			setPx(Planeta.w - getWidth());
 			_vel = 0;
 		}
 
 		if (getPy() < 0) {
 			setPy(0);
-			velRise = 0;
+			velRise = -velRiseMax * 0.2f;// kick
 		} else if (getAllHeight() > Planeta.h) {
-			setPy(Planeta.h - getAllHeight());
+			setPy(Planeta.h - getHeight());
 			velRise = 0;
 		}
+		// ------------------------------
 
-		//------------------------------
-		
 		if (naveControl.isActive()) {
 		}
 
@@ -212,8 +190,11 @@ public class Nave extends ElementModel {
 
 	private void keyUpdateShip() {
 
+		boolean collideTop = collideTop();
+		boolean collideBottom = collide();
+		
 		if (damage < MAX_DAMAGE) {
-			if (naveControl.isActive() && up) {
+			if (!collideTop && naveControl.isActive() && up) {
 				open = false;
 				on = true;
 
@@ -235,17 +216,29 @@ public class Nave extends ElementModel {
 				}
 
 			} else {
-				velRise = 0f;
+				//velRise = 0f;
 			}
 
 		}
 
-		boolean collideBottom = collide();
+		if (collideBottom) {
+			// TODO implementar
+			//System.out.println(velRise);
+			if (velRise < 0f && velRise > -velRiseInc * 2) {
+				System.out.println(velRise + " x " + -velRiseInc);
+				incDamage();
+			}
+
+		}
 
 		if (collideBottom && velRise < 0f) {
 			velRise = 0f;
 			on = false;
 			// open = true;
+			
+		} else if (collideTop) {
+			on = false;
+			velRise -= velRiseInc * 2f;
 		}
 
 		if (!collideBottom) {
@@ -293,6 +286,7 @@ public class Nave extends ElementModel {
 
 		} else {
 			_vel = 0f;
+
 		}
 
 		/*
@@ -301,6 +295,10 @@ public class Nave extends ElementModel {
 
 		incPx(-_vel);
 		incPy(-velRise);
+	}
+
+	private boolean collideTop() {
+		return getPy() < RISE_LIMIT || getPy() < 0;
 	}
 
 	private void incDamage() {
@@ -357,7 +355,7 @@ public class Nave extends ElementModel {
 		} else {
 			s.invert(false).draw(g2d, Camera.c().fx(getPx()), Camera.c().fy(getPy()), 0, 0);
 
-			if (on) {
+			if (on && velRise >= -velRiseMax) {
 				s = SpriteTool.s(fogo).matriz(5, 1);
 				s.invert(false).draw(g2d, Camera.c().fx(getPx()) + 25, Camera.c().fy(getAllHeight() - 21),
 						SpriteTool.SORT, 0);
@@ -366,7 +364,7 @@ public class Nave extends ElementModel {
 
 		bar.drawMe(g2d);
 
-		g2d.setColor(Color.BLACK);
+		g2d.setColor(Color.LIGHT_GRAY);
 		g2d.drawString("Rise: " + velRise, 10, 15);
 		g2d.drawString("Vel: " + _vel, 10, 25);
 		g2d.drawString("Py: " + getPy(), 10, 45);
