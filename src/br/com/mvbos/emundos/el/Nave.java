@@ -6,6 +6,7 @@ import java.awt.Graphics2D;
 import javax.swing.ImageIcon;
 
 import br.com.mvbos.emundos.Config;
+import br.com.mvbos.emundos.data.NavePlaces;
 import br.com.mvbos.emundos.sc.Planeta;
 import br.com.mvbos.jeg.element.ElementModel;
 import br.com.mvbos.jeg.engine.Engine;
@@ -26,7 +27,9 @@ public class Nave extends ElementModel {
 
 	private Player player;
 
+	private NavePlaces places;
 	private Menu naveControl;
+	private Menu energy;
 	private BarraStatus bar;
 
 	private boolean action;
@@ -53,8 +56,6 @@ public class Nave extends ElementModel {
 
 	boolean open;
 
-	private boolean stable;
-
 	private boolean up;
 
 	private boolean down;
@@ -72,9 +73,14 @@ public class Nave extends ElementModel {
 
 		fogo = new ImageIcon(Config.PATH + "fogo.png");
 
-		naveControl = new Menu(0, 0, 10, 10);
+		naveControl = new Menu(0, 0, 1, 1);
 		naveControl.setNave(this);
 		naveControl.loadElement();
+
+		energy = new Menu(0, 0, 1, 1);
+		energy.setNave(this);
+		energy.setType(Menu.Type.ENERGY);
+		energy.loadElement();
 
 		bar = new BarraStatus(Engine.getIWindowGame().getCanvasWidth() - 110, 10, 100, 15);
 		bar.loadElement();
@@ -93,16 +99,22 @@ public class Nave extends ElementModel {
 
 		}
 
-		naveControl.update();
+		// reset controls
+		naveControl.setVisible(false);
+		energy.setVisible(false);
+		// naveControl.update();
 
 		if (player != null) {
+
+			repCont(naveControl);
+			repCont(energy);
 
 			if (player.getState() == Player.State.DEF) {
 				open = true;
 
 			} else if (player.getState() == Player.State.IN) {
 				open = true;
-				player.setPy(naveControl.getAllHeight() - player.getHeight());
+				player.setPy(getAllHeight() - player.getHeight());
 
 			} else if (player.getState() == Player.State.IN_CONTROLLER) {
 				player.setPxy(naveControl.getPx() - 5, naveControl.getAllHeight() - player.getHeight());
@@ -135,11 +147,11 @@ public class Nave extends ElementModel {
 						releaseControll();
 					}
 
-				} else {
 				}
 
-				action = false;
-
+			} else if (GraphicTool.g().collide(player, energy) != null) {
+				energy.setVisible(true);
+				//energy.setActive(false);
 			}
 
 			// update camera
@@ -148,10 +160,6 @@ public class Nave extends ElementModel {
 		} else {
 			open = false;
 		}
-
-		bar.setDamage(damage);
-		bar.update();
-		bar.setVisible(player != null);
 
 		// TODO criar wrap util:
 		if (getPx() < 0) {
@@ -175,11 +183,40 @@ public class Nave extends ElementModel {
 		if (naveControl.isActive()) {
 		}
 
-		/*
-		 * if (getAllHeight() >= Engine.getIWindowGame().getCanvasHeight()) {
-		 * setPy(Engine.getIWindowGame().getCanvasHeight() - getHeight());
-		 * Camera.c().setCpy(0); }
-		 */
+		// subs updates
+		bar.setDamage(damage);
+		bar.update();
+		bar.setVisible(player != null);
+
+		action = false;
+	}
+
+	/**
+	 * Reposicionar controle
+	 * 
+	 * @param el
+	 */
+	private void repCont(ElementModel el) {
+		float x = 0;
+		float y = 0;
+
+		if (el == naveControl) {
+			x = places.getControl().x;
+			y = places.getControl().y;
+
+		} else {
+			x = places.getEnergy().x;
+			y = places.getEnergy().y;
+		}
+
+		if (isInvert()) {
+			// el.setPxy(getPx() + x, getAllHeight() - el.getHeight() - y);
+			el.setPxy(getAllWidth() - x, getAllHeight() - el.getHeight() - y);
+		} else {
+			// el.setPxy(getAllWidth() - x, getAllHeight() - el.getHeight() -
+			// y);
+			el.setPxy(getPx() + x, getAllHeight() - el.getHeight() - y);
+		}
 	}
 
 	private void releaseControll() {
@@ -194,7 +231,7 @@ public class Nave extends ElementModel {
 
 		boolean collideTop = collideTop();
 		boolean collideBottom = collide();
-		
+
 		if (damage < MAX_DAMAGE) {
 			if (!collideTop && naveControl.isActive() && up) {
 				open = false;
@@ -218,14 +255,15 @@ public class Nave extends ElementModel {
 				}
 
 			} else {
-				//velRise = 0f;
+				// TODO
+				velRise = 0f;
 			}
 
 		}
 
 		if (collideBottom) {
 			// TODO implementar
-			//System.out.println(velRise);
+			// System.out.println(velRise);
 			if (velRise < 0f && velRise > -velRiseInc * 2) {
 				System.out.println(velRise + " x " + -velRiseInc);
 				incDamage();
@@ -237,7 +275,7 @@ public class Nave extends ElementModel {
 			velRise = 0f;
 			on = false;
 			// open = true;
-			
+
 		} else if (collideTop) {
 			on = false;
 			velRise -= velRiseInc * 2f;
@@ -347,29 +385,31 @@ public class Nave extends ElementModel {
 	}
 
 	@Override
-	public void drawMe(Graphics2D g2d) {
+	public void drawMe(Graphics2D g) {
 		SpriteTool s = SpriteTool.s(getImage()).matriz(2, 1);
 
 		if (open) {
-			s.invert(false).draw(g2d, Camera.c().fx(getPx()), Camera.c().fy(getPy()), 1, 0);
-			naveControl.drawMe(g2d);
+			s.invert(false).draw(g, Camera.c().fx(getPx()), Camera.c().fy(getPy()), 1, 0);
+			
+			naveControl.drawMe(g);
+			energy.drawMe(g);
 
 		} else {
-			s.invert(false).draw(g2d, Camera.c().fx(getPx()), Camera.c().fy(getPy()), 0, 0);
+			s.invert(false).draw(g, Camera.c().fx(getPx()), Camera.c().fy(getPy()), 0, 0);
 
 			if (on && velRise >= -velRiseMax) {
 				s = SpriteTool.s(fogo).matriz(5, 1);
-				s.invert(false).draw(g2d, Camera.c().fx(getPx()) + 25, Camera.c().fy(getAllHeight() - 21),
+				s.invert(false).draw(g, Camera.c().fx(getPx()) + 25, Camera.c().fy(getAllHeight() - 21),
 						SpriteTool.SORT, 0);
 			}
 		}
 
-		bar.drawMe(g2d);
+		bar.drawMe(g);
 
-		g2d.setColor(Color.LIGHT_GRAY);
-		g2d.drawString("Rise: " + velRise, 10, 15);
-		g2d.drawString("Vel: " + _vel, 10, 25);
-		g2d.drawString("Py: " + getPy(), 10, 45);
+		g.setColor(Color.LIGHT_GRAY);
+		g.drawString("Rise: " + velRise, 10, 15);
+		g.drawString("Vel: " + _vel, 10, 25);
+		g.drawString("Py: " + getPy(), 10, 45);
 	}
 
 	public Player getPlayer() {
@@ -442,4 +482,7 @@ public class Nave extends ElementModel {
 		}
 	}
 
+	public void setPlaces(NavePlaces np) {
+		this.places = np;
+	}
 }

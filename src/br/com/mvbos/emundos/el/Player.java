@@ -6,7 +6,6 @@ import javax.swing.ImageIcon;
 
 import br.com.mvbos.emundos.Config;
 import br.com.mvbos.jeg.element.ElementModel;
-import br.com.mvbos.jeg.engine.Engine;
 import br.com.mvbos.jeg.engine.KeysMap;
 import br.com.mvbos.jeg.engine.SpriteTool;
 import br.com.mvbos.jeg.window.Camera;

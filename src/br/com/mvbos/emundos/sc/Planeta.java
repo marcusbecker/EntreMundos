@@ -6,12 +6,14 @@ import java.awt.Graphics2D;
 import javax.swing.ImageIcon;
 
 import br.com.mvbos.emundos.Config;
+import br.com.mvbos.emundos.data.NavePlaces;
 import br.com.mvbos.emundos.el.Bloco;
 import br.com.mvbos.emundos.el.Nave;
 import br.com.mvbos.emundos.el.Player;
 import br.com.mvbos.jeg.engine.Engine;
 import br.com.mvbos.jeg.engine.GraphicTool;
 import br.com.mvbos.jeg.engine.KeysMap;
+import br.com.mvbos.jeg.scene.Pxy;
 import br.com.mvbos.jeg.scene.impl.SceneDefault;
 import br.com.mvbos.jeg.window.Camera;
 import br.com.mvbos.jeg.window.impl.MemoryImpl;
@@ -20,8 +22,8 @@ public class Planeta extends SceneDefault {
 
 	private static final GraphicTool G = GraphicTool.g();
 
-	private Player p = new Player();
-	private Nave n = new Nave();
+	private Player p;
+	private Nave n;
 
 	private int[] keys = { 38, 40, 37, 39 };// cima, baixo, esq, dir
 
@@ -33,6 +35,15 @@ public class Planeta extends SceneDefault {
 	@Override
 	public boolean startScene() {
 		memo = new MemoryImpl(90);
+		
+		n = new Nave();
+		p = new Player();
+		
+		NavePlaces np = new NavePlaces();//config externa
+		np.setControl(new Pxy(55, 0));
+		np.setEnergy(new Pxy(30, 0));
+		n.setPlaces(np);
+		
 		for (int i = 1; i < 40; i++) {
 			memo.registerElement(new Bloco(450 * i, Planeta.h - 450, 30, 30));
 		}

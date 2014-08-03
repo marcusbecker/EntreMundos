@@ -22,22 +22,26 @@ public class Menu extends ElementModel {
 
 	@Override
 	public void loadElement() {
-		if(type == Type.NAV){
+		if (type == Type.ENERGY) {
+			setImage(new ImageIcon(Config.PATH + "ico_nav_en.png"));
+		} else {
 			setImage(new ImageIcon(Config.PATH + "ico_nav_ac.png"));
 		}
-		
 	}
 
 	final Font f = new Font("Arial", Font.PLAIN, 16);
 
 	@Override
 	public void drawMe(Graphics2D g2d) {
+
+		drawBorders(g2d);
+
 		if (isVisible() && !isActive()) {
 
 			if (getImage() != null) {
 
-				g2d.drawImage(getImage().getImage(), Camera.c().fx(getPx() - 10), Camera.c().fy(getPy() - 100), 40,
-						32, null);
+				g2d.drawImage(getImage().getImage(), Camera.c().fx(getPx() - 10), Camera.c().fy(getPy() - 100), 40, 32,
+						null);
 				g2d.setColor(Color.LIGHT_GRAY);
 				g2d.drawRect(Camera.c().fx(getPx() + 10), Camera.c().fy(getPy() - 60), 1, 40);
 
@@ -73,12 +77,6 @@ public class Menu extends ElementModel {
 
 	@Override
 	public void update() {
-		setVisible(false);
-		if (nave.isInvert()) {
-			setPxy(nave.getPx() + 20, nave.getAllHeight() - getHeight());
-		} else {
-			setPxy(nave.getAllWidth() - 30, nave.getAllHeight() - getHeight());
-		}
 	}
 
 	public Menu(int positionX, int positionY, int width, int height) {
@@ -95,6 +93,14 @@ public class Menu extends ElementModel {
 
 	public void setActive(boolean active) {
 		this.active = active;
+	}
+
+	public Type getType() {
+		return type;
+	}
+
+	public void setType(Type type) {
+		this.type = type;
 	}
 
 }
