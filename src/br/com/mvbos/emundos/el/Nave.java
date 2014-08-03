@@ -74,8 +74,10 @@ public class Nave extends ElementModel {
 
 		naveControl = new Menu(0, 0, 10, 10);
 		naveControl.setNave(this);
+		naveControl.loadElement();
 
 		bar = new BarraStatus(Engine.getIWindowGame().getCanvasWidth() - 110, 10, 100, 15);
+		bar.loadElement();
 	}
 
 	@Override
