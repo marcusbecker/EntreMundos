@@ -28,22 +28,22 @@ public class Planeta extends SceneDefault {
 	private int[] keys = { 38, 40, 37, 39 };// cima, baixo, esq, dir
 
 	private ImageIcon bg;
-	
+
 	public static int w = 3970;
 	public static int h = 3970;
 
 	@Override
 	public boolean startScene() {
 		memo = new MemoryImpl(90);
-		
+
 		n = new Nave();
 		p = new Player();
-		
-		NavePlaces np = new NavePlaces();//config externa
+
+		NavePlaces np = new NavePlaces();// config externa
 		np.setControl(new Pxy(55, 0));
 		np.setEnergy(new Pxy(30, 0));
 		n.setPlaces(np);
-		
+
 		for (int i = 1; i < 40; i++) {
 			memo.registerElement(new Bloco(450 * i, Planeta.h - 450, 30, 30));
 		}
@@ -64,13 +64,12 @@ public class Planeta extends SceneDefault {
 		Engine.endGame = false;
 
 		bg = new ImageIcon(Config.PATH + "bg_space.png");
-		
-		
+
 		p.setPy(Planeta.h - 40);
 		n.setPy(Planeta.h - 60);
-		
+
 		Camera.c().config(w, h).rollY(Planeta.h - Engine.getIWindowGame().getCanvasHeight());
-		//System.out.println(Camera.c());
+		// System.out.println(Camera.c());
 
 		return true;
 	}
@@ -85,20 +84,27 @@ public class Planeta extends SceneDefault {
 		for (int i = 0; i < memo.getElementCount(); i++) {
 			memo.getByElement(i).update();
 		}
+
+		if (n.getPlayer() != null) {
+			Camera.c().center(n);
+		} else {
+			Camera.c().center(p);
+		}
 	}
 
 	@Override
 	public void resizeWindow() {
-		//TODO reajuste camera
-		//p.setPy(Engine.getIWindowGame().getCanvasHeight() - 40);
-		//n.setPy(Engine.getIWindowGame().getCanvasHeight() - 60);
+		// TODO reajuste camera
+		// p.setPy(Engine.getIWindowGame().getCanvasHeight() - 40);
+		// n.setPy(Engine.getIWindowGame().getCanvasHeight() - 60);
 	}
 
 	@Override
 	public void drawElements(Graphics2D g2d) {
 
 		if (bg != null) {
-			g2d.drawImage(bg.getImage(), 0, (int) -Camera.c().getCpy(), Engine.getIWindowGame().getWindowWidth(), 3970, null);
+			g2d.drawImage(bg.getImage(), 0, (int) -Camera.c().getCpy(), Engine.getIWindowGame().getWindowWidth(), 3970,
+					null);
 		}
 
 		if (Engine.endGame) {

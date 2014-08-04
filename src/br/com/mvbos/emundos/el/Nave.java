@@ -154,9 +154,6 @@ public class Nave extends ElementModel {
 				//energy.setActive(false);
 			}
 
-			// update camera
-			Camera.c().center(this);
-
 		} else {
 			open = false;
 		}

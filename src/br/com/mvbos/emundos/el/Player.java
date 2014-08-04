@@ -65,9 +65,6 @@ public class Player extends ElementModel {
 			if (dir > 0)
 				dir--;
 		}
-		
-		// update camera
-		Camera.c().center(this);
 
 	}
 
