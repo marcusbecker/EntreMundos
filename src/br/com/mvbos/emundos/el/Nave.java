@@ -262,7 +262,7 @@ public class Nave extends ElementModel {
 			// TODO implementar
 			// System.out.println(velRise);
 			if (velRise < 0f && velRise > -velRiseInc * 2) {
-				System.out.println(velRise + " x " + -velRiseInc);
+				//System.out.println(velRise + " x " + -velRiseInc);
 				incDamage();
 			}
 
@@ -406,7 +406,7 @@ public class Nave extends ElementModel {
 		g.setColor(Color.LIGHT_GRAY);
 		g.drawString("Rise: " + velRise, 10, 15);
 		g.drawString("Vel: " + _vel, 10, 25);
-		g.drawString("Py: " + getPy(), 10, 45);
+		g.drawString("x,y: " + getPx() + "," + getPy(), 10, 45);
 	}
 
 	public Player getPlayer() {
