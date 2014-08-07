@@ -11,6 +11,7 @@ import br.com.mvbos.emundos.el.Bloco;
 import br.com.mvbos.emundos.el.Loja;
 import br.com.mvbos.emundos.el.Nave;
 import br.com.mvbos.emundos.el.Player;
+import br.com.mvbos.jeg.element.ElementModel;
 import br.com.mvbos.jeg.engine.Engine;
 import br.com.mvbos.jeg.engine.GraphicTool;
 import br.com.mvbos.jeg.engine.KeysMap;
@@ -44,10 +45,9 @@ public class Planeta extends SceneDefault {
 		np.setControl(new Pxy(55, 0));
 		np.setEnergy(new Pxy(30, 0));
 		n.setPlaces(np);
-		
+
 		Loja loja = new Loja();
 		loja.setSize(200, 200);
-				
 
 		for (int i = 1; i < 40; i++) {
 			memo.registerElement(new Bloco(450 * i, Planeta.h - 450, 30, 30));
@@ -59,7 +59,7 @@ public class Planeta extends SceneDefault {
 
 		memo.registerElement(p);
 		memo.registerElement(n);
-		
+
 		memo.registerElement(loja);
 
 		for (int i = 0; i < memo.getElementCount(); i++) {
@@ -74,7 +74,7 @@ public class Planeta extends SceneDefault {
 
 		p.setPy(Planeta.h - p.getHeight());
 		n.setPy(Planeta.h - n.getHeight());
-		
+
 		loja.setPxy(750, Planeta.h - loja.getHeight());
 
 		Camera.c().config(w, h).rollY(Planeta.h - Engine.getIWindowGame().getCanvasHeight());
@@ -92,6 +92,19 @@ public class Planeta extends SceneDefault {
 	public void update() {
 		for (int i = 0; i < memo.getElementCount(); i++) {
 			memo.getByElement(i).update();
+		}
+
+		if (p.getState() == Player.State.DEF) {
+			for (int i = memo.getElementCount() - 1; i >= 0; i--) {
+				ElementModel el = memo.getByElement(i);
+
+				if (GraphicTool.g().collide(p, el) != null) {
+					if (el instanceof Loja) {
+						System.out.println("loja");
+						break;
+					}
+				}
+			}
 		}
 
 		if (n.getPlayer() != null) {

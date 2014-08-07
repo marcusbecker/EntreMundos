@@ -8,6 +8,10 @@ import br.com.mvbos.jeg.window.Camera;
 public class Loja extends ElementModel {
 
 	@Override
+	public void update() {
+	}
+	
+	@Override
 	public void drawMe(Graphics2D g) {
 		if (!isVisible()) {
 			return;

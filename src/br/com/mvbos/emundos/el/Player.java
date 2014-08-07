@@ -13,7 +13,7 @@ import br.com.mvbos.jeg.window.Camera;
 public class Player extends ElementModel {
 
 	public enum State {
-		DEF, IN, IN_CONTROLLER;
+		DEF, IN, IN_CONTROLLER, IN_PLACE;
 	}
 
 	int dir = 0; // direction
