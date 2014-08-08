@@ -95,19 +95,30 @@ public class Planeta extends SceneDefault {
 		}
 
 		if (p.getState() == Player.State.DEF) {
-			for (int i = memo.getElementCount() - 1; i >= 0; i--) {
-				ElementModel el = memo.getByElement(i);
-
-				if (GraphicTool.g().collide(p, el) != null) {
-					if (el instanceof Loja) {
-						System.out.println("loja");
-						break;
-					}
+			
+			ElementModel el = GraphicTool.g().collide(p, memo);
+			
+			if (el instanceof Loja) {
+				// TODO dialogs and actions
+				Loja l = (Loja) el;
+				if (l.getItem(0) != null) {
+					p.addItem(l.getItem(0));
+					l.removeItem(0);
 				}
 			}
+			
+			
+			/*Loja l = GraphicTool.g().collide(p, memo, Loja.class);
+			if (l != null) {
+				// TODO dialogs and actions
+				if (l.getItem(0) != null) {
+					p.addItem(l.getItem(0));
+					l.removeItem(0);
+				}
+			}*/
 		}
 
-		if (n.getPlayer() != null) {
+		if (p.getState() == Player.State.IN_CONTROLLER) {
 			Camera.c().center(n);
 		} else {
 			Camera.c().center(p);

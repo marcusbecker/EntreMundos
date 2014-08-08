@@ -1,10 +1,12 @@
 package br.com.mvbos.emundos.el;
 
+import java.awt.Color;
 import java.awt.Graphics2D;
 
 import javax.swing.ImageIcon;
 
 import br.com.mvbos.emundos.Config;
+import br.com.mvbos.emundos.data.Item;
 import br.com.mvbos.jeg.element.ElementModel;
 import br.com.mvbos.jeg.engine.KeysMap;
 import br.com.mvbos.jeg.engine.SpriteTool;
@@ -32,6 +34,8 @@ public class Player extends ElementModel {
 	private Nave n;
 
 	public int velInc = 2;
+
+	private Item[] itens = new Item[6];
 
 	@Override
 	public void loadElement() {
@@ -74,7 +78,17 @@ public class Player extends ElementModel {
 	}
 
 	@Override
-	public void drawMe(Graphics2D g2d) {
+	public void drawMe(Graphics2D g) {
+
+		g.setColor(Color.BLUE);
+		for (int i = 0; i < itens.length; i++) {
+			if (itens[i] == null) {
+				g.drawRect((20 * i) + 5, 30, 20, 20);
+
+			} else {
+				g.fillRect((20 * i) + 5, 30, 20, 20);
+			}
+		}
 
 		if (getImage() != null) {
 			int col = 0;
@@ -107,10 +121,10 @@ public class Player extends ElementModel {
 
 			SpriteTool s = SpriteTool.s(getImage()).matriz(5, 2);
 
-			s.invert(invert).draw(g2d, Camera.c().fx(getPx()), Camera.c().fy(getPy()), col, line);
+			s.invert(invert).draw(g, Camera.c().fx(getPx()), Camera.c().fy(getPy()), col, line);
 
 		} else {
-			super.drawMe(g2d);
+			super.drawMe(g);
 		}
 	}
 
@@ -171,6 +185,21 @@ public class Player extends ElementModel {
 		}
 
 		this.n = n;
+	}
+
+	public Item[] getItens() {
+		return itens;
+	}
+
+	public boolean addItem(Item item) {
+		for (int i = 0; i < itens.length; i++) {
+			if (itens[i] == null) {
+				itens[i] = item;
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 }
