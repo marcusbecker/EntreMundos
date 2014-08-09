@@ -19,4 +19,9 @@ public class Item {
 		this.type = type;
 	}
 
+	@Override
+	public String toString() {
+		return "Item [type=" + type + "]";
+	}
+
 }

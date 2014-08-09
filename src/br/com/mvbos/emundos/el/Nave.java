@@ -417,11 +417,6 @@ public class Nave extends ElementModel {
 		this.player = player;
 	}
 
-	public void action() {
-		this.action = true;
-
-	}
-
 	public boolean isInvert() {
 		return invert;
 	}
@@ -450,6 +445,8 @@ public class Nave extends ElementModel {
 			rgt = true;
 			lft = false;
 			break;
+		case B1:
+			this.action = true;
 		default:
 			break;
 		}

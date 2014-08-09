@@ -27,7 +27,11 @@ public class Planeta extends SceneDefault {
 	private Player p;
 	private Nave n;
 
-	private int[] keys = { 38, 40, 37, 39 };// cima, baixo, esq, dir
+	//private final ElementModel BLANK = new ElementModel();
+
+	private ElementModel temp;
+
+	private int[] keys = { 38, 40, 37, 39, 81, 69 };// cima, baixo, esq, dir, Q, E
 
 	private ImageIcon bg;
 
@@ -46,7 +50,7 @@ public class Planeta extends SceneDefault {
 		np.setEnergy(new Pxy(30, 0));
 		n.setPlaces(np);
 
-		Loja loja = new Loja();
+		Loja loja = new Loja(this);
 		loja.setSize(200, 200);
 
 		for (int i = 1; i < 40; i++) {
@@ -90,32 +94,27 @@ public class Planeta extends SceneDefault {
 
 	@Override
 	public void update() {
-		for (int i = 0; i < memo.getElementCount(); i++) {
-			memo.getByElement(i).update();
+		if (G.collide(p, n) != null) {
+			n.setPlayer(p);
+			p.inShip();
+
+			temp = null;
+
+		} else {
+			n.setPlayer(null);
+			p.exitShip();
+
+			temp = GraphicTool.g().collide(p, memo);
+
+			if (temp instanceof Loja) {
+				// p.setState(Player.State.IN_FOCUS);
+			} else {
+				p.setState(Player.State.DEF);
+			}
 		}
 
-		if (p.getState() == Player.State.DEF) {
-			
-			ElementModel el = GraphicTool.g().collide(p, memo);
-			
-			if (el instanceof Loja) {
-				// TODO dialogs and actions
-				Loja l = (Loja) el;
-				if (l.getItem(0) != null) {
-					p.addItem(l.getItem(0));
-					l.removeItem(0);
-				}
-			}
-			
-			
-			/*Loja l = GraphicTool.g().collide(p, memo, Loja.class);
-			if (l != null) {
-				// TODO dialogs and actions
-				if (l.getItem(0) != null) {
-					p.addItem(l.getItem(0));
-					l.removeItem(0);
-				}
-			}*/
+		for (int i = 0; i < memo.getElementCount(); i++) {
+			memo.getByElement(i).update();
 		}
 
 		if (p.getState() == Player.State.IN_CONTROLLER) {
@@ -169,36 +168,37 @@ public class Planeta extends SceneDefault {
 
 	@Override
 	public void keyEvent(char keyChar, int keyCode) {
+		KeysMap k = null;
+
 		if (keyCode == keys[0]) {
-			p.go(KeysMap.UP);
-			n.press(KeysMap.UP);
+			k = KeysMap.UP;
 
 		} else if (keyCode == keys[1]) {
-			p.go(KeysMap.DOWN);
-			n.press(KeysMap.DOWN);
+			k = KeysMap.DOWN;
 
 		} else if (keyCode == keys[2]) {
-			p.go(KeysMap.LEFT);
-			n.press(KeysMap.LEFT);
+			k = KeysMap.LEFT;
 
 		} else if (keyCode == keys[3]) {
-			p.go(KeysMap.RIGHT);
-			n.press(KeysMap.RIGHT);
+			k = KeysMap.RIGHT;
 
-		} else /* if (keyCode == keys[4]) */{
-			p.action();
-			n.action();
+		} else if (keyCode == keys[4]){
+			k = KeysMap.B0;
+			
+		} else if (keyCode == keys[5]){
+			k = KeysMap.B1;
 		}
 
-		// n.setInside(G.collide(p, n) != null);
+		if (k != null) {
+			p.press(k);
+			n.press(k);
 
-		if (G.collide(p, n) != null) {
-			n.setPlayer(p);
-			p.setNave(n);
-
-		} else {
-			n.setPlayer(null);
-			p.setNave(null);
+			if (temp != null) {
+				if (temp instanceof Loja) {
+					// TODO dialogs and actions
+					((Loja) temp).press(k);
+				}
+			}
 		}
 	}
 
@@ -219,5 +219,9 @@ public class Planeta extends SceneDefault {
 			n.release(KeysMap.RIGHT);
 
 		}
+	}
+
+	public Player getPlayer() {
+		return p;
 	}
 }

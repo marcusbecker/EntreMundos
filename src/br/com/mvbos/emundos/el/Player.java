@@ -15,7 +15,7 @@ import br.com.mvbos.jeg.window.Camera;
 public class Player extends ElementModel {
 
 	public enum State {
-		DEF, IN, IN_CONTROLLER, IN_PLACE;
+		DEF, IN, IN_CONTROLLER, IN_PLACE, IN_FOCUS;
 	}
 
 	int dir = 0; // direction
@@ -31,7 +31,6 @@ public class Player extends ElementModel {
 	private boolean rgt;
 
 	private int life;
-	private Nave n;
 
 	public int velInc = 2;
 
@@ -149,8 +148,8 @@ public class Player extends ElementModel {
 		this.state = state;
 	}
 
-	public void go(KeysMap direction) {
-		if (getState() == Player.State.IN_CONTROLLER) {
+	public void press(KeysMap direction) {
+		if (getState() == Player.State.IN_CONTROLLER || getState() == Player.State.IN_PLACE) {
 			return;
 		}
 
@@ -170,21 +169,9 @@ public class Player extends ElementModel {
 		}
 	}
 
-	public void action() {
-
-	}
-
 	public void reposition(boolean invert, int px, int py) {
 		setDirection(invert);
 		setPxy(px, py);
-	}
-
-	public void setNave(Nave n) {
-		if (n == null) {
-			setState(State.DEF);
-		}
-
-		this.n = n;
 	}
 
 	public Item[] getItens() {
@@ -200,6 +187,18 @@ public class Player extends ElementModel {
 		}
 
 		return false;
+	}
+
+	public void inShip() {
+		if (getState() == State.DEF) {
+			setState(State.IN);
+		}
+	}
+
+	public void exitShip() {
+		if (getState() == State.IN || getState() == State.IN_CONTROLLER) {
+			setState(State.DEF);
+		}
 	}
 
 }
