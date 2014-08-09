@@ -32,8 +32,6 @@ public class Nave extends ElementModel {
 	private Menu energy;
 	private BarraStatus bar;
 
-	private boolean action;
-
 	private boolean invert;
 
 	private float _vel;
@@ -63,6 +61,8 @@ public class Nave extends ElementModel {
 	private boolean lft;
 
 	private boolean rgt;
+
+	private boolean bAction;
 
 	private int damage;
 
@@ -108,6 +108,8 @@ public class Nave extends ElementModel {
 
 			repCont(naveControl);
 			repCont(energy);
+			
+			bAction = bAction && !player.isInMenu();
 
 			if (player.getState() == Player.State.DEF) {
 				open = true;
@@ -127,7 +129,7 @@ public class Nave extends ElementModel {
 
 				naveControl.setVisible(player.getState() != Player.State.IN_CONTROLLER);
 
-				if (action) {
+				if (bAction) {
 
 					if (naveControl.isActive()) {
 						player.reposition(isInvert(), player.getPx(), naveControl.getAllHeight() - player.getHeight());
@@ -151,12 +153,12 @@ public class Nave extends ElementModel {
 
 			} else if (GraphicTool.g().collide(player, energy) != null) {
 				energy.setVisible(true);
-				//energy.setActive(false);
-				
-				if (action && player.getItemActive() != null) {
+				// energy.setActive(false);
+
+				if (bAction && player.getItemActive() != null) {
 					player.removeItemActive();
 				}
-				
+
 			}
 
 		} else {
@@ -190,7 +192,7 @@ public class Nave extends ElementModel {
 		bar.update();
 		bar.setVisible(player != null);
 
-		action = false;
+		bAction = false;
 	}
 
 	/**
@@ -221,8 +223,10 @@ public class Nave extends ElementModel {
 		}
 	}
 
+	/**
+	 * Force release keys
+	 */
 	private void releaseControll() {
-		// release controllers
 		up = false;
 		down = false;
 		lft = false;
@@ -267,7 +271,7 @@ public class Nave extends ElementModel {
 			// TODO implementar
 			// System.out.println(velRise);
 			if (velRise < 0f && velRise > -velRiseInc * 2) {
-				//System.out.println(velRise + " x " + -velRiseInc);
+				// System.out.println(velRise + " x " + -velRiseInc);
 				incDamage();
 			}
 
@@ -392,7 +396,7 @@ public class Nave extends ElementModel {
 
 		if (open) {
 			s.invert(false).draw(g, Camera.c().fx(getPx()), Camera.c().fy(getPy()), 1, 0);
-			
+
 			naveControl.drawMe(g);
 			energy.drawMe(g);
 
@@ -431,7 +435,7 @@ public class Nave extends ElementModel {
 	}
 
 	public void press(KeysMap direction) {
-		action = false;
+		bAction = false;
 
 		switch (direction) {
 		case UP:
@@ -453,14 +457,14 @@ public class Nave extends ElementModel {
 		case B0:
 			break;
 		case B1:
-			this.action = true;
+			bAction = true;
 		default:
 			break;
 		}
 	}
 
 	public void release(KeysMap direction) {
-		action = false;
+		bAction = false;
 		if (!naveControl.isActive()) {
 			return;
 		}

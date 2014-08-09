@@ -216,15 +216,19 @@ public class Planeta extends SceneDefault {
 
 		if (isKey(keyChar, keyCode, 0)) {
 			n.release(KeysMap.UP);
+			p.release(KeysMap.UP);
 
 		} else if (isKey(keyChar, keyCode, 1)) {
 			n.release(KeysMap.DOWN);
-
+			p.release(KeysMap.DOWN);
+			
 		} else if (isKey(keyChar, keyCode, 2)) {
 			n.release(KeysMap.LEFT);
+			p.release(KeysMap.LEFT);
 
 		} else if (isKey(keyChar, keyCode, 3)) {
 			n.release(KeysMap.RIGHT);
+			p.release(KeysMap.RIGHT);
 
 		}
 	}

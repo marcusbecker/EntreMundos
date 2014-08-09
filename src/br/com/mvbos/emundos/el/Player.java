@@ -22,13 +22,12 @@ public class Player extends ElementModel {
 	private boolean invert;
 	private State state = State.DEF;
 
+	// buttons
 	private boolean up;
-
 	private boolean down;
-
 	private boolean lft;
-
 	private boolean rgt;
+	private boolean bAction;
 
 	private int life;
 
@@ -38,7 +37,6 @@ public class Player extends ElementModel {
 	private boolean inMenu;
 	private boolean itemActive;
 	private Item[] itens = new Item[6];
-	private boolean action;
 
 	@Override
 	public void loadElement() {
@@ -61,9 +59,11 @@ public class Player extends ElementModel {
 				}
 			}
 
-			if (action && itens[iSel] != null) {
+			if (bAction && itens[iSel] != null) {
 				itemActive = !itemActive;
 			}
+
+			releaseControll();
 
 		} else {
 			if (getState() == State.IN) {
@@ -83,9 +83,9 @@ public class Player extends ElementModel {
 
 		up = false;
 		down = false;
-		lft = false;
-		rgt = false;
-		action = false;
+		// lft = false;
+		// rgt = false;
+		bAction = false;
 
 		if (state == State.DEF || state == State.IN) {
 			if (dir > 0)
@@ -157,7 +157,7 @@ public class Player extends ElementModel {
 			Loja.drawSelectionMenu(g, itens, iSel);
 
 		}
-		
+
 		if (itemActive) {
 			g.fillRect(Camera.c().fx(getPx() - 10), Camera.c().fy(getPy()), 10, 10);
 		}
@@ -204,7 +204,34 @@ public class Player extends ElementModel {
 			inMenu = !inMenu;
 			break;
 		case B1:
-			action = true;
+			bAction = true;
+			break;
+		default:
+			break;
+		}
+	}
+
+	private void releaseControll() {
+		up = false;
+		down = false;
+		lft = false;
+		rgt = false;
+	}
+
+	public void release(KeysMap direction) {
+		bAction = false;
+		switch (direction) {
+		case UP:
+			up = false;
+			break;
+		case DOWN:
+			down = false;
+			break;
+		case LEFT:
+			lft = false;
+			break;
+		case RIGHT:
+			rgt = false;
 			break;
 		default:
 			break;
