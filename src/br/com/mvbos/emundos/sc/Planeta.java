@@ -27,11 +27,13 @@ public class Planeta extends SceneDefault {
 	private Player p;
 	private Nave n;
 
-	//private final ElementModel BLANK = new ElementModel();
+	// private final ElementModel BLANK = new ElementModel();
 
 	private ElementModel temp;
 
-	private int[] keys = { 38, 40, 37, 39, 81, 69 };// cima, baixo, esq, dir, Q, E
+	// cima, baixo, esq, dir, Q, E
+	private int[] keysCode = { 38, 40, 37, 39, 81, 69 };
+	private char[] keysChar = { 'w', 's', 'a', 'd', 'q', 'e' };
 
 	private ImageIcon bg;
 
@@ -166,39 +168,45 @@ public class Planeta extends SceneDefault {
 		// g2d.setTransform(tx);
 	}
 
+	private boolean isKey(char keyChar, int keyCode, int idKeyMap) {
+		return Character.toLowerCase(keyChar) == Character.toLowerCase(keysChar[idKeyMap])
+				|| keyCode == keysCode[idKeyMap];
+	}
+
 	@Override
 	public void keyEvent(char keyChar, int keyCode) {
 		KeysMap k = null;
 
-		if (keyCode == keys[0]) {
+		if (isKey(keyChar, keyCode, 0)) {
 			k = KeysMap.UP;
 
-		} else if (keyCode == keys[1]) {
+		} else if (isKey(keyChar, keyCode, 1)) {
 			k = KeysMap.DOWN;
 
-		} else if (keyCode == keys[2]) {
+		} else if (isKey(keyChar, keyCode, 2)) {
 			k = KeysMap.LEFT;
 
-		} else if (keyCode == keys[3]) {
+		} else if (isKey(keyChar, keyCode, 3)) {
 			k = KeysMap.RIGHT;
 
-		} else if (keyCode == keys[4]){
+		} else if (isKey(keyChar, keyCode, 4)) {
 			k = KeysMap.B0;
-			
-		} else if (keyCode == keys[5]){
+
+		} else if (isKey(keyChar, keyCode, 5)) {
 			k = KeysMap.B1;
 		}
 
 		if (k != null) {
-			p.press(k);
-			n.press(k);
-
 			if (temp != null) {
 				if (temp instanceof Loja) {
 					// TODO dialogs and actions
 					((Loja) temp).press(k);
 				}
 			}
+
+			p.press(k);
+			n.press(k);
+
 		}
 	}
 
@@ -206,16 +214,16 @@ public class Planeta extends SceneDefault {
 	public void keyRelease(char keyChar, int keyCode) {
 		p.stop();
 
-		if (keyCode == keys[0]) {
+		if (isKey(keyChar, keyCode, 0)) {
 			n.release(KeysMap.UP);
 
-		} else if (keyCode == keys[1]) {
+		} else if (isKey(keyChar, keyCode, 1)) {
 			n.release(KeysMap.DOWN);
 
-		} else if (keyCode == keys[2]) {
+		} else if (isKey(keyChar, keyCode, 2)) {
 			n.release(KeysMap.LEFT);
 
-		} else if (keyCode == keys[3]) {
+		} else if (isKey(keyChar, keyCode, 3)) {
 			n.release(KeysMap.RIGHT);
 
 		}

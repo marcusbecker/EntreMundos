@@ -41,37 +41,44 @@ public class Loja extends ElementModel {
 		Camera.c().close(g, this);
 
 		if (openMenu) {
-			int px = Engine.getIWindowGame().getWindowWidth() / 2 - 500 / 2;
-			int py = Engine.getIWindowGame().getWindowHeight() / 2 - 200 / 2;
+			drawSelectionMenu(g, itens, iSel);
+		}
+	}
 
-			g.fillRect(px, py, 500, 200);
+	public static void drawSelectionMenu(Graphics2D g, Item[] itens, int iSel) {
+		final int px = Engine.getIWindowGame().getWindowWidth() / 2 - 500 / 2;
+		final int py = Engine.getIWindowGame().getWindowHeight() / 2 - 200 / 2;
 
-			int s = 60;
-			// g.drawRect(px + 0 + 20, py + 5, 40, 40);
-			// g.drawRect(px + 40 + 40, py + 5, 40, 40);
-			for (int i = 0; i < itens.length; i++) {
-				g.setColor(Color.ORANGE);
+		g.fillRect(px, py, 500, 200);
 
-				if (i == iSel) {
-					g.fillRect(px + (i * s) + (20 * (i + 1)), py + 15, s, s);
+		final int s = 60;
+		// g.drawRect(px + 0 + 20, py + 5, 40, 40);
+		// g.drawRect(px + 40 + 40, py + 5, 40, 40);
+		for (int i = 0; i < itens.length; i++) {
+			g.setColor(Color.ORANGE);
 
-				} else if (itens[i] != null) {
-					g.drawRect(px + (i * s) + (20 * (i + 1)), py + 15, s, s);
+			if (i == iSel) {
+				g.fillRect(px + (i * s) + (20 * (i + 1)) + 5, py + 15 + 5, s - 9, s - 10);
 
-				} else {
-					g.setColor(Color.GREEN);
-					g.drawRect(px + (i * s) + (20 * (i + 1)), py + 15, s, s);
-				}
 			}
 
-			if (itens[iSel] != null) {
-				g.setColor(Color.BLACK);
-				g.drawString(itens[iSel].toString(), px + 20, py + 200 - 20);
+			if (itens[i] != null) {
+				g.drawRect(px + (i * s) + (20 * (i + 1)), py + 15, s, s);
 
 			} else {
-				g.setColor(Color.BLACK);
-				g.drawString("---", px + 20, py + 200 - 20);
+				g.setColor(Color.GREEN);
+				g.drawRect(px + (i * s) + (20 * (i + 1)), py + 15, s, s);
 			}
+
+		}
+
+		if (itens[iSel] != null) {
+			g.setColor(Color.BLACK);
+			g.drawString(itens[iSel].toString(), px + 20, py + 200 - 20);
+
+		} else {
+			g.setColor(Color.BLACK);
+			g.drawString("---", px + 20, py + 200 - 20);
 		}
 	}
 
@@ -92,14 +99,14 @@ public class Loja extends ElementModel {
 	}
 
 	public void press(KeysMap k) {
-		int l = 0;
+		// int l = 0;
 		if (openMenu) {
 			switch (k) {
 			case UP:
-				l++;
+				// l++;
 				break;
 			case DOWN:
-				l--;
+				// l--;
 				break;
 			case LEFT:
 				iSel--;
@@ -113,19 +120,15 @@ public class Loja extends ElementModel {
 		} else {
 			iSel = 0;
 		}
-
 		Player p = planeta.getPlayer();
-		
+
 		switch (k) {
 		case B0:
 			openMenu = !openMenu;
-			p.setState(openMenu ? Player.State.IN_PLACE : Player.State.DEF);
-			
+			p.setInMenu(!openMenu);
 			break;
 		case B1:
 			if (openMenu) {
-				//p.setState(openMenu ? Player.State.IN_PLACE : Player.State.DEF);
-
 				if (getItem(iSel) != null) {
 					p.addItem(getItem(iSel));
 					removeItem(iSel);
@@ -135,6 +138,8 @@ public class Loja extends ElementModel {
 		default:
 			break;
 		}
+
+		p.setState(openMenu ? Player.State.IN_PLACE : Player.State.DEF);
 
 		/*
 		 * if (l < 0 || l == itens.length) { l = l < 0 ? itens.length - 1 : 0; }

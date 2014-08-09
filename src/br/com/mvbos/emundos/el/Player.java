@@ -34,7 +34,11 @@ public class Player extends ElementModel {
 
 	public int velInc = 2;
 
+	private int iSel;
+	private boolean inMenu;
+	private boolean itemActive;
 	private Item[] itens = new Item[6];
+	private boolean action;
 
 	@Override
 	public void loadElement() {
@@ -45,17 +49,35 @@ public class Player extends ElementModel {
 	@Override
 	public void update() {
 
-		if (getState() == State.IN) {
+		if (itemActive && itens[iSel] == null) {
+			itemActive = false;
+		}
 
-		} else if (getState() == State.IN_CONTROLLER) {
+		if (inMenu) {
+			if (lft || rgt) {
+				iSel += lft ? -1 : +1;
+				if (iSel < 0 || iSel == itens.length) {
+					iSel = iSel < 0 ? itens.length - 1 : 0;
+				}
+			}
+
+			if (action && itens[iSel] != null) {
+				itemActive = !itemActive;
+			}
 
 		} else {
+			if (getState() == State.IN) {
 
-			if (lft) {
-				moveX(-velInc);
+			} else if (getState() == State.IN_CONTROLLER) {
 
-			} else if (rgt) {
-				moveX(velInc);
+			} else {
+
+				if (lft) {
+					moveX(-velInc);
+
+				} else if (rgt) {
+					moveX(velInc);
+				}
 			}
 		}
 
@@ -63,6 +85,7 @@ public class Player extends ElementModel {
 		down = false;
 		lft = false;
 		rgt = false;
+		action = false;
 
 		if (state == State.DEF || state == State.IN) {
 			if (dir > 0)
@@ -72,6 +95,10 @@ public class Player extends ElementModel {
 	}
 
 	public void moveX(int inc) {
+		if (inMenu) {
+			return;
+		}
+
 		setDirection(inc < 0);
 		incPx(inc);
 	}
@@ -125,6 +152,15 @@ public class Player extends ElementModel {
 		} else {
 			super.drawMe(g);
 		}
+
+		if (inMenu) {
+			Loja.drawSelectionMenu(g, itens, iSel);
+
+		}
+		
+		if (itemActive) {
+			g.fillRect(Camera.c().fx(getPx() - 10), Camera.c().fy(getPy()), 10, 10);
+		}
 	}
 
 	public void setDirection(boolean invert) {
@@ -164,6 +200,12 @@ public class Player extends ElementModel {
 		case RIGHT:
 			rgt = true;
 			break;
+		case B0:
+			inMenu = !inMenu;
+			break;
+		case B1:
+			action = true;
+			break;
 		default:
 			break;
 		}
@@ -199,6 +241,22 @@ public class Player extends ElementModel {
 		if (getState() == State.IN || getState() == State.IN_CONTROLLER) {
 			setState(State.DEF);
 		}
+	}
+
+	public boolean isInMenu() {
+		return inMenu;
+	}
+
+	public void setInMenu(boolean inMenu) {
+		this.inMenu = inMenu;
+	}
+
+	public Item getItemActive() {
+		return itens[iSel];
+	}
+
+	public void removeItemActive() {
+		itens[iSel] = null;
 	}
 
 }

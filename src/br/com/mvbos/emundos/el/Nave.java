@@ -152,6 +152,11 @@ public class Nave extends ElementModel {
 			} else if (GraphicTool.g().collide(player, energy) != null) {
 				energy.setVisible(true);
 				//energy.setActive(false);
+				
+				if (action && player.getItemActive() != null) {
+					player.removeItemActive();
+				}
+				
 			}
 
 		} else {
@@ -189,7 +194,7 @@ public class Nave extends ElementModel {
 	}
 
 	/**
-	 * Reposicionar controle
+	 * Reposiciona elementos na nave
 	 * 
 	 * @param el
 	 */
@@ -444,6 +449,8 @@ public class Nave extends ElementModel {
 		case RIGHT:
 			rgt = true;
 			lft = false;
+			break;
+		case B0:
 			break;
 		case B1:
 			this.action = true;
