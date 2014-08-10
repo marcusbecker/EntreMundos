@@ -7,12 +7,14 @@ import javax.swing.ImageIcon;
 
 import br.com.mvbos.emundos.Config;
 import br.com.mvbos.emundos.data.NavePlaces;
+import br.com.mvbos.emundos.el.BackgroundElement;
 import br.com.mvbos.emundos.el.Bloco;
 import br.com.mvbos.emundos.el.Loja;
 import br.com.mvbos.emundos.el.Nave;
 import br.com.mvbos.emundos.el.Player;
 import br.com.mvbos.jeg.element.ElementModel;
 import br.com.mvbos.jeg.engine.Engine;
+import br.com.mvbos.jeg.engine.GameEngineModel;
 import br.com.mvbos.jeg.engine.GraphicTool;
 import br.com.mvbos.jeg.engine.KeysMap;
 import br.com.mvbos.jeg.scene.Pxy;
@@ -36,6 +38,8 @@ public class Planeta extends SceneDefault {
 	private char[] keysChar = { 'w', 's', 'a', 'd', 'q', 'e' };
 
 	private ImageIcon bg;
+	private BackgroundElement fbg;
+	private BackgroundElement sbg;
 
 	public static int w = 3970;
 	public static int h = 3970;
@@ -77,6 +81,13 @@ public class Planeta extends SceneDefault {
 		Engine.endGame = false;
 
 		bg = new ImageIcon(Config.PATH + "bg_space.png");
+		fbg = new BackgroundElement();
+		fbg.setImage(new ImageIcon(Config.PATH + "f1s1.png"));
+		fbg.loadElement();
+		
+		sbg = new BackgroundElement();
+		sbg.setImage(new ImageIcon(Config.PATH + "f1s2.png"));
+		sbg.loadElement();
 
 		p.setPy(Planeta.h - p.getHeight());
 		n.setPy(Planeta.h - n.getHeight());
@@ -134,16 +145,17 @@ public class Planeta extends SceneDefault {
 	}
 
 	@Override
-	public void drawElements(Graphics2D g2d) {
+	public void drawElements(Graphics2D g) {
 
 		if (bg != null) {
-			g2d.drawImage(bg.getImage(), 0, (int) -Camera.c().getCpy(), Engine.getIWindowGame().getWindowWidth(), 3970,
-					null);
+			g.drawImage(bg.getImage(), 0, (int) -Camera.c().getCpy(), w, h, null);
 		}
 
+		fbg.drawMe(g);
+		
 		if (Engine.endGame) {
-			g2d.setColor(Color.BLUE);
-			g2d.drawString("GAME OVER", 300, 300);
+			g.setColor(Color.BLUE);
+			g.drawString("GAME OVER", 300, 300);
 
 			return;
 		}
@@ -155,7 +167,7 @@ public class Planeta extends SceneDefault {
 
 		for (int i = memo.getElementCount() - 1; i >= 0; i--) {
 			if (memo.getByElement(i).isVisible()) {
-				memo.getByElement(i).drawMe(g2d);
+				memo.getByElement(i).drawMe(g);
 			}
 		}
 
@@ -166,6 +178,9 @@ public class Planeta extends SceneDefault {
 		// AffineTransform old = g2d.getTransform();
 		// AffineTransform tx = AffineTransform.getScaleInstance(-1, 1);
 		// g2d.setTransform(tx);
+		
+		
+		sbg.drawMe(g);
 	}
 
 	private boolean isKey(char keyChar, int keyCode, int idKeyMap) {
@@ -221,7 +236,7 @@ public class Planeta extends SceneDefault {
 		} else if (isKey(keyChar, keyCode, 1)) {
 			n.release(KeysMap.DOWN);
 			p.release(KeysMap.DOWN);
-			
+
 		} else if (isKey(keyChar, keyCode, 2)) {
 			n.release(KeysMap.LEFT);
 			p.release(KeysMap.LEFT);
