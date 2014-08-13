@@ -387,7 +387,7 @@ public class Nave extends ElementModel {
 	}
 
 	private boolean collide() {
-		return getAllHeight() >= Planeta.h;
+		return getAllHeight() >= Planeta.h - Planeta.base;
 	}
 
 	@Override

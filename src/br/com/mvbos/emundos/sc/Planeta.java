@@ -37,12 +37,16 @@ public class Planeta extends SceneDefault {
 	private int[] keysCode = { 38, 40, 37, 39, 81, 69 };
 	private char[] keysChar = { 'w', 's', 'a', 'd', 'q', 'e' };
 
-	private ImageIcon bg;
+	private ImageIcon bg; //background
+	private ImageIcon bt; //bottom
+	
 	private BackgroundElement fbg;
 	private BackgroundElement sbg;
 
 	public static int w = 3970;
 	public static int h = 3970;
+	
+	public static int base = 75;
 
 	@Override
 	public boolean startScene() {
@@ -81,16 +85,17 @@ public class Planeta extends SceneDefault {
 		Engine.endGame = false;
 
 		bg = new ImageIcon(Config.PATH + "bg_space.png");
-		fbg = new BackgroundElement();
-		fbg.setImage(new ImageIcon(Config.PATH + "f1s1.png"));
-		fbg.loadElement();
+		bt = new ImageIcon(Config.PATH + "p01/bt.png");
 		
-		sbg = new BackgroundElement();
-		sbg.setImage(new ImageIcon(Config.PATH + "f1s2.png"));
-		sbg.loadElement();
+		fbg = new BackgroundElement();
+		fbg.setImage(new ImageIcon(Config.PATH + "p01/fnd.png"));
+		fbg.loadElement();
+		//sbg = new BackgroundElement();
+		//sbg.setImage(new ImageIcon(Config.PATH + "f1s2.png"));
+		//sbg.loadElement();
 
-		p.setPy(Planeta.h - p.getHeight());
-		n.setPy(Planeta.h - n.getHeight());
+		p.setPy(Planeta.h - Planeta.base - p.getHeight());
+		n.setPy(Planeta.h - Planeta.base - n.getHeight());
 
 		loja.setPxy(750, Planeta.h - loja.getHeight());
 
@@ -147,10 +152,9 @@ public class Planeta extends SceneDefault {
 	@Override
 	public void drawElements(Graphics2D g) {
 
-		if (bg != null) {
-			g.drawImage(bg.getImage(), 0, (int) -Camera.c().getCpy(), w, h, null);
-		}
-
+		
+		g.drawImage(bg.getImage(), 0, (int) -Camera.c().getCpy(), w, h, null);
+		
 		fbg.drawMe(g);
 		
 		if (Engine.endGame) {
@@ -170,6 +174,13 @@ public class Planeta extends SceneDefault {
 				memo.getByElement(i).drawMe(g);
 			}
 		}
+	
+		
+		int base = (int) (h - Camera.c().getCpy());
+		g.drawImage(bt.getImage(), 0, base - bt.getIconHeight(), w, bt.getIconHeight(), null);
+		
+		
+		g.drawImage(bt.getImage(), 0, base - bt.getIconHeight(), w, bt.getIconHeight(), null);
 
 		// g2d.setColor(Color.BLUE);
 		// g2d.drawRect(Engine.getIWindowGame().getWindowWidth() / 2, 0, 1,
@@ -180,7 +191,7 @@ public class Planeta extends SceneDefault {
 		// g2d.setTransform(tx);
 		
 		
-		sbg.drawMe(g);
+		//sbg.drawMe(g);
 	}
 
 	private boolean isKey(char keyChar, int keyCode, int idKeyMap) {

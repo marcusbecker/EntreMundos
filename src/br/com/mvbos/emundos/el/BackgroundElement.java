@@ -18,13 +18,15 @@ public class BackgroundElement extends ElementModel {
 	@Override
 	public void drawMe(Graphics2D g) {
 		int st = getAllWidth();
+		if (st <= 0) {
+			return;
+		}
 
 		if (Camera.c().getCpx() < getAllWidth()) {
 			g.drawImage(getImage().getImage(), Camera.c().fx(getPx()), Camera.c().fy(getPy()), null);
 		}
 
 		while (st < Engine.getIWindowGame().getCanvasWidth() + Camera.c().getCpx()) {
-			
 			if (st + getWidth() > Camera.c().getCpx()) {
 				g.drawImage(getImage().getImage(), Camera.c().fx(st), Camera.c().fy(getPy()), null);
 			}
