@@ -19,11 +19,7 @@ public class Nave extends ElementModel {
 
 	private static final int RISE_LIMIT = 1600;
 
-	private static final int GRAVITY = 50;
-
 	private static final float RANGE = 0.1f;
-
-	private static final int MAX_DAMAGE = 100;
 
 	private Player player;
 
@@ -48,6 +44,8 @@ public class Nave extends ElementModel {
 
 	// private ElementModel contexto;
 
+	// private float consumo = 0.0001f;
+
 	private ImageIcon fogo;
 
 	private boolean on;
@@ -63,8 +61,6 @@ public class Nave extends ElementModel {
 	private boolean rgt;
 
 	private boolean bAction;
-
-	private int damage;
 
 	@Override
 	public void loadElement() {
@@ -92,13 +88,6 @@ public class Nave extends ElementModel {
 		keyUpdateShip();
 		keyUpdatePlayer();
 
-		if (getPy() < RISE_LIMIT) {
-			// incDamage();
-			// setPy(RISE_LIMIT);
-			// velRise = -velRiseMax * 0.2f;//kick
-
-		}
-
 		// reset controls
 		naveControl.setVisible(false);
 		energy.setVisible(false);
@@ -108,7 +97,7 @@ public class Nave extends ElementModel {
 
 			repCont(naveControl);
 			repCont(energy);
-			
+
 			bAction = bAction && !player.isInMenu();
 
 			if (player.getState() == Player.State.DEF) {
@@ -157,6 +146,9 @@ public class Nave extends ElementModel {
 
 				if (bAction && player.getItemActive() != null) {
 					player.removeItemActive();
+
+					bar.incDamage(-50);
+					bar.incEnergy(90);
 				}
 
 			}
@@ -166,29 +158,42 @@ public class Nave extends ElementModel {
 		}
 
 		// TODO criar wrap util:
-		if (getPx() < 0) {
-			setPx(0);
-			_vel = 0;
-
-		} else if (getAllWidth() > Planeta.w) {
-			setPx(Planeta.w - getWidth());
+		if (getPx() < 0 || getAllWidth() > Planeta.w) {
+			setPx(getPx() < 0 ? 0 : Planeta.w - getWidth());
 			_vel = 0;
 		}
 
-		if (getPy() < 0) {
-			setPy(0);
-			velRise = -velRiseMax * 0.2f;// kick
-		} else if (getAllHeight() > Planeta.h) {
-			setPy(Planeta.h - getHeight());
-			velRise = 0;
+		if (collideTop()) {
+			// velRise = -velRiseMax * 0.2f;// kick
+		} else if (collideBottom() && velRise < -0.55) {
+			velRise = velRise * -0.3f; // kick
+			bar.incDamage(velRise);
+		}
+
+		// TODO verificar
+		if (getAllHeight() > Planeta.h - Planeta.base) {
+			setPy(Planeta.h - Planeta.base - getHeight());
 		}
 		// ------------------------------
 
 		if (naveControl.isActive()) {
 		}
 
+		if (on) {
+			bar.incEnergy(-0.01f);
+
+			if (bar.fullDamage()) {
+				on = false;
+			}
+
+		} else {
+			if (!collideBottom()) {
+				velRise -= velRiseInc * 3;
+				//System.out.println("baixo");
+			}
+		}
+
 		// subs updates
-		bar.setDamage(damage);
 		bar.update();
 		bar.setVisible(player != null);
 
@@ -236,9 +241,10 @@ public class Nave extends ElementModel {
 	private void keyUpdateShip() {
 
 		boolean collideTop = collideTop();
-		boolean collideBottom = collide();
+		boolean collideBottom = collideBottom();
 
-		if (damage < MAX_DAMAGE) {
+		if (readyToFly()) {
+
 			if (!collideTop && naveControl.isActive() && up) {
 				open = false;
 				on = true;
@@ -260,21 +266,13 @@ public class Nave extends ElementModel {
 					velRise += velRiseInc * 0.5;
 				}
 
-			} else {
-				// TODO
+			} else if (on) {
+				// Estabiliza
 				velRise = 0f;
 			}
 
-		}
-
-		if (collideBottom) {
-			// TODO implementar
-			// System.out.println(velRise);
-			if (velRise < 0f && velRise > -velRiseInc * 2) {
-				// System.out.println(velRise + " x " + -velRiseInc);
-				incDamage();
-			}
-
+		} else {
+			on = false;
 		}
 
 		if (collideBottom && velRise < 0f) {
@@ -285,43 +283,40 @@ public class Nave extends ElementModel {
 		} else if (collideTop) {
 			on = false;
 			velRise -= velRiseInc * 2f;
+			bar.incDamage(0.05f);
 		}
 
 		if (!collideBottom) {
-			if (naveControl.isActive() && lft) {
-				open = false;
-				if (_vel < velMax) {
-					_vel += velInc;
-				}
+			if (on) {
+				if (naveControl.isActive() && lft) {
+					open = false;
+					if (_vel < velMax) {
+						_vel += velInc;
+					}
 
-			} else if (naveControl.isActive() && rgt) {
-				open = false;
-				if (_vel > -velMax) {
-					_vel -= velInc;
-				}
+				} else if (naveControl.isActive() && rgt) {
+					open = false;
+					if (_vel > -velMax) {
+						_vel -= velInc;
+					}
 
-			} else if (_vel > RANGE || _vel < -RANGE) {
-				if (_vel > 0.1f) {
-					_vel -= velInc * 0.5;
+				} else if (_vel > RANGE || _vel < -RANGE) {
+					if (_vel > 0.1f) {
+						_vel -= velInc * 0.5;
 
-				} else if (_vel < 0.1f) {
-					_vel += velInc * 0.5;
+					} else if (_vel < 0.1f) {
+						_vel += velInc * 0.5;
 
-				}
+					}
 
-			} else {
-				_vel = 0f;
-			}
-
-			if (damage >= MAX_DAMAGE) {
-				on = false;
-				if (velRise > -GRAVITY) {
-					velRise -= velRiseInc * 2;
+				} else {
+					_vel = 0f;
 				}
 			}
 
 		} else if (_vel > RANGE || _vel < -RANGE) {
-			incDamage();
+			// bar.incDamage(_vel < 0 ? -_vel : _vel);
+			bar.incDamage(1);
 
 			if (_vel > velInc) {
 				_vel -= velInc * 2;
@@ -343,18 +338,16 @@ public class Nave extends ElementModel {
 		incPy(-velRise);
 	}
 
+	public boolean readyToFly() {
+		return !bar.fullDamage() && bar.getEnergy() > 0;
+	}
+
 	private boolean collideTop() {
 		return getPy() < RISE_LIMIT || getPy() < 0;
 	}
 
-	private void incDamage() {
-		if (++damage > MAX_DAMAGE) {
-			damage = MAX_DAMAGE;
-		}
-	}
-
 	private void fix() {
-		damage = 0;
+		bar.setDamage(0);
 	}
 
 	private void keyUpdatePlayer() {
@@ -386,12 +379,16 @@ public class Nave extends ElementModel {
 		return getAllHeight() < Engine.getIWindowGame().getCanvasHeight();
 	}
 
-	private boolean collide() {
+	private boolean collideBottom() {
 		return getAllHeight() >= Planeta.h - Planeta.base;
 	}
 
 	@Override
 	public void drawMe(Graphics2D g) {
+		if (!open && player != null && player.getState() == Player.State.IN_CONTROLLER) {
+			player.drawMe(g);
+		}
+
 		SpriteTool s = SpriteTool.s(getImage()).matriz(2, 1);
 
 		if (open) {

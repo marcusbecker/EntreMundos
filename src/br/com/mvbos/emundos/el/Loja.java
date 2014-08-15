@@ -3,11 +3,15 @@ package br.com.mvbos.emundos.el;
 import java.awt.Color;
 import java.awt.Graphics2D;
 
+import javax.swing.ImageIcon;
+
+import br.com.mvbos.emundos.Config;
 import br.com.mvbos.emundos.data.Item;
 import br.com.mvbos.emundos.sc.Planeta;
 import br.com.mvbos.jeg.element.ElementModel;
 import br.com.mvbos.jeg.engine.Engine;
 import br.com.mvbos.jeg.engine.KeysMap;
+import br.com.mvbos.jeg.engine.SpriteTool;
 import br.com.mvbos.jeg.window.Camera;
 
 public class Loja extends ElementModel {
@@ -25,6 +29,9 @@ public class Loja extends ElementModel {
 
 	@Override
 	public void loadElement() {
+		setImage(new ImageIcon(Config.PATH + "l_01.png"));
+		//setSize(getImage().getIconWidth(), getImage().getIconHeight());
+
 		itens[0] = new Item(Menu.Type.ENERGY);
 	}
 
@@ -38,9 +45,21 @@ public class Loja extends ElementModel {
 			return;
 		}
 
-		Camera.c().close(g, this);
+		if (getImage() != null) {
+			SpriteTool s = SpriteTool.s(getImage()).matriz(2, 1);
+
+			s.invert(false).draw(g, Camera.c().fx(getPx()), Camera.c().fy(getPy()), 0, 0);
+			//draw atendente
+			
+			s.invert(false).draw(g, Camera.c().fx(getPx()), Camera.c().fy(getPy()), 1, 0);
+			
+
+		} else {
+			Camera.c().close(g, this);
+		}
 
 		if (openMenu) {
+			g.setColor(Color.BLUE);
 			drawSelectionMenu(g, itens, iSel);
 		}
 	}

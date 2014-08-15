@@ -14,7 +14,6 @@ import br.com.mvbos.emundos.el.Nave;
 import br.com.mvbos.emundos.el.Player;
 import br.com.mvbos.jeg.element.ElementModel;
 import br.com.mvbos.jeg.engine.Engine;
-import br.com.mvbos.jeg.engine.GameEngineModel;
 import br.com.mvbos.jeg.engine.GraphicTool;
 import br.com.mvbos.jeg.engine.KeysMap;
 import br.com.mvbos.jeg.scene.Pxy;
@@ -41,7 +40,7 @@ public class Planeta extends SceneDefault {
 	private ImageIcon bt; //bottom
 	
 	private BackgroundElement fbg;
-	private BackgroundElement sbg;
+	//private BackgroundElement sbg;
 
 	public static int w = 3970;
 	public static int h = 3970;
@@ -61,7 +60,7 @@ public class Planeta extends SceneDefault {
 		n.setPlaces(np);
 
 		Loja loja = new Loja(this);
-		loja.setSize(200, 200);
+		loja.setSize(170, 140);
 
 		for (int i = 1; i < 40; i++) {
 			memo.registerElement(new Bloco(450 * i, Planeta.h - 450, 30, 30));
@@ -96,8 +95,7 @@ public class Planeta extends SceneDefault {
 
 		p.setPy(Planeta.h - Planeta.base - p.getHeight());
 		n.setPy(Planeta.h - Planeta.base - n.getHeight());
-
-		loja.setPxy(750, Planeta.h - loja.getHeight());
+		loja.setPxy(750, Planeta.h - Planeta.base - loja.getHeight());
 
 		Camera.c().config(w, h).rollY(Planeta.h - Engine.getIWindowGame().getCanvasHeight());
 		// System.out.println(Camera.c());
