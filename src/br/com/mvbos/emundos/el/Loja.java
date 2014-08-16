@@ -11,6 +11,7 @@ import br.com.mvbos.emundos.sc.Planeta;
 import br.com.mvbos.jeg.element.ElementModel;
 import br.com.mvbos.jeg.engine.Engine;
 import br.com.mvbos.jeg.engine.KeysMap;
+import br.com.mvbos.jeg.engine.MathTool;
 import br.com.mvbos.jeg.engine.SpriteTool;
 import br.com.mvbos.jeg.window.Camera;
 
@@ -23,6 +24,13 @@ public class Loja extends ElementModel {
 
 	private boolean openMenu;
 
+	private ImageIcon atendente;
+
+	private int atPy = 0;
+	private int atPx = 0;
+	private boolean dir;
+	private boolean hold;
+
 	public Loja(Planeta planeta) {
 		this.planeta = planeta;
 	}
@@ -30,13 +38,39 @@ public class Loja extends ElementModel {
 	@Override
 	public void loadElement() {
 		setImage(new ImageIcon(Config.PATH + "l_01.png"));
-		//setSize(getImage().getIconWidth(), getImage().getIconHeight());
+		atendente = new ImageIcon(Config.PATH + "p_loja.png");
 
 		itens[0] = new Item(Menu.Type.ENERGY);
 	}
 
 	@Override
 	public void update() {
+
+		if (atPx == 0) {
+			atPx = getPx() + 10;
+			atPy = getAllHeight() - atendente.getIconHeight();
+		}
+
+		if (!hold) {
+			hold = MathTool.r.nextInt(100) == 10;
+
+		} else if (MathTool.r.nextInt(100) > 95) {
+			hold = false;
+		}
+
+		if (!openMenu && !hold) {
+			if (!dir && atPx < (getAllWidth() - 25)) {
+				atPx++;
+			} else {
+				dir = true;
+			}
+
+			if (dir && atPx > getPx() + 10) {
+				atPx--;
+			} else {
+				dir = false;
+			}
+		}
 	}
 
 	@Override
@@ -46,13 +80,14 @@ public class Loja extends ElementModel {
 		}
 
 		if (getImage() != null) {
-			SpriteTool s = SpriteTool.s(getImage()).matriz(2, 1);
+			SpriteTool.s(getImage()).matriz(2, 1).invert(false)
+					.draw(g, Camera.c().fx(getPx()), Camera.c().fy(getPy()), 0, 0);
 
-			s.invert(false).draw(g, Camera.c().fx(getPx()), Camera.c().fy(getPy()), 0, 0);
-			//draw atendente
-			
-			s.invert(false).draw(g, Camera.c().fx(getPx()), Camera.c().fy(getPy()), 1, 0);
-			
+			SpriteTool.s(atendente).matriz(2, 1).invert(dir)
+					.draw(g, Camera.c().fx(atPx), Camera.c().fy(atPy), openMenu || hold ? 1 : 0, 0);
+
+			SpriteTool.s(getImage()).matriz(2, 1).invert(false)
+					.draw(g, Camera.c().fx(getPx()), Camera.c().fy(getPy()), 1, 0);
 
 		} else {
 			Camera.c().close(g, this);

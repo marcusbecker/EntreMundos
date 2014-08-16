@@ -12,6 +12,7 @@ import br.com.mvbos.jeg.element.ElementModel;
 import br.com.mvbos.jeg.engine.Engine;
 import br.com.mvbos.jeg.engine.GraphicTool;
 import br.com.mvbos.jeg.engine.KeysMap;
+import br.com.mvbos.jeg.engine.MathTool;
 import br.com.mvbos.jeg.engine.SpriteTool;
 import br.com.mvbos.jeg.window.Camera;
 
@@ -189,7 +190,7 @@ public class Nave extends ElementModel {
 		} else {
 			if (!collideBottom()) {
 				velRise -= velRiseInc * 3;
-				//System.out.println("baixo");
+				// System.out.println("baixo");
 			}
 		}
 
@@ -246,17 +247,17 @@ public class Nave extends ElementModel {
 		if (readyToFly()) {
 
 			if (!collideTop && naveControl.isActive() && up) {
-				open = false;
-				on = true;
-
-				if (velRise < velRiseMax) {
+				if (on && velRise < velRiseMax) {
 					velRise += velRiseInc;
 				}
+
+				open = false;
+				on = true;
 
 			} else if (naveControl.isActive() && down) {
 				open = false;
 				if (velRise > -velRiseMax) {
-					velRise -= velRiseInc;
+					velRise -= velRiseInc * 2f;
 				}
 
 			} else if (velRise > RANGE || velRise < -RANGE) {
@@ -338,6 +339,43 @@ public class Nave extends ElementModel {
 		incPy(-velRise);
 	}
 
+	private void keyUpdatePlayer() {
+		if (player == null || player.getState() != Player.State.IN) {
+			return;
+		}
+
+		player.incPx(-_vel);
+
+		if (up) {
+			// player.incPy(-velRise);
+		} else if (down) {
+			// player.incPy(-velRise);
+		}
+
+		if (lft) {
+			if (on && player.getPx() - player.velInc - 1 < getPx()) {
+				player.stop();
+			} else {
+				player.moveX(-player.velInc);
+			}
+
+		} else if (rgt) {
+			if (on && player.getAllWidth() + player.velInc + 1 > getAllWidth()) {
+				player.stop();
+			} else {
+				player.moveX(player.velInc);
+			}
+		}
+
+		releaseControll();
+
+	}
+
+	/**
+	 * Return true if Ship has Life and Energy
+	 * 
+	 * @return
+	 */
 	public boolean readyToFly() {
 		return !bar.fullDamage() && bar.getEnergy() > 0;
 	}
@@ -348,31 +386,6 @@ public class Nave extends ElementModel {
 
 	private void fix() {
 		bar.setDamage(0);
-	}
-
-	private void keyUpdatePlayer() {
-		if (player == null || player.getState() != Player.State.IN) {
-			return;
-		}
-
-		player.incPx(-_vel);
-		// player.incPy(-velRise);
-
-		if (up) {
-
-		} else if (down) {
-
-		}
-
-		if (lft) {
-			player.moveX(-player.velInc);
-
-		} else if (rgt) {
-			player.moveX(player.velInc);
-		}
-
-		releaseControll();
-
 	}
 
 	private boolean isFly() {
@@ -400,10 +413,12 @@ public class Nave extends ElementModel {
 		} else {
 			s.invert(false).draw(g, Camera.c().fx(getPx()), Camera.c().fy(getPy()), 0, 0);
 
-			if (on && velRise >= -velRiseMax) {
-				s = SpriteTool.s(fogo).matriz(5, 1);
-				s.invert(false).draw(g, Camera.c().fx(getPx()) + 25, Camera.c().fy(getAllHeight() - 21),
-						SpriteTool.SORT, 0);
+			if (on) {
+				if (velRise >= -velRiseMax) {
+					s = SpriteTool.s(fogo).matriz(5, 1).invert(false);
+					s.draw(g, Camera.c().fx(getPx()) + 25, Camera.c().fy(getAllHeight() - 21),
+							down ? MathTool.r.nextInt(2) : SpriteTool.SORT, 0);
+				}
 			}
 		}
 
