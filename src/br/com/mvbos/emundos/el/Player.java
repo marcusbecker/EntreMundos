@@ -154,7 +154,7 @@ public class Player extends ElementModel {
 		}
 
 		if (inMenu) {
-			Loja.drawSelectionMenu(g, itens, iSel);
+			Loja._drawSelectionMenu(g, itens, iSel);
 
 		}
 
@@ -268,6 +268,16 @@ public class Player extends ElementModel {
 		if (getState() == State.IN || getState() == State.IN_CONTROLLER) {
 			setState(State.DEF);
 		}
+	}
+
+	@Override
+	public int getHitWidth() {
+		return getWidth() - 10;
+	}
+
+	@Override
+	public float getHitX() {
+		return getPx() + 5;
 	}
 
 	public boolean isInMenu() {

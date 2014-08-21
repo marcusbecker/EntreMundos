@@ -18,6 +18,10 @@ import br.com.mvbos.jeg.window.Camera;
 
 public class Nave extends ElementModel {
 
+	private static final int BACK_LIMIT = 2;
+
+	private static final int FRONT_LIMIT = 5;
+
 	private static final int RISE_LIMIT = 1600;
 
 	private static final float RANGE = 0.1f;
@@ -74,7 +78,7 @@ public class Nave extends ElementModel {
 		naveControl.setNave(this);
 		naveControl.loadElement();
 
-		energy = new Menu(0, 0, 1, 1);
+		energy = new Menu(0, 0, 5, 1);
 		energy.setNave(this);
 		energy.setType(Menu.Type.ENERGY);
 		energy.loadElement();
@@ -353,14 +357,14 @@ public class Nave extends ElementModel {
 		}
 
 		if (lft) {
-			if (on && player.getPx() - player.velInc - 1 < getPx()) {
+			if (on && player.getPx() - player.velInc - (invert ? FRONT_LIMIT : BACK_LIMIT) < getPx()) {
 				player.stop();
 			} else {
 				player.moveX(-player.velInc);
 			}
 
 		} else if (rgt) {
-			if (on && player.getAllWidth() + player.velInc + 1 > getAllWidth()) {
+			if (on && player.getAllWidth() + player.velInc + (invert ? BACK_LIMIT : FRONT_LIMIT) > getAllWidth()) {
 				player.stop();
 			} else {
 				player.moveX(player.velInc);

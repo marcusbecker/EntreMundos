@@ -17,7 +17,7 @@ import br.com.mvbos.jeg.window.Camera;
 
 public class Loja extends ElementModel {
 
-	private Item[] itens = new Item[6];
+	private Item[] itens = new Item[5];
 	private Planeta planeta;
 
 	private int iSel;
@@ -25,6 +25,7 @@ public class Loja extends ElementModel {
 	private boolean openMenu;
 
 	private ImageIcon atendente;
+	private ImageIcon menu;
 
 	private int atPy = 0;
 	private int atPx = 0;
@@ -39,6 +40,7 @@ public class Loja extends ElementModel {
 	public void loadElement() {
 		setImage(new ImageIcon(Config.PATH + "l_01.png"));
 		atendente = new ImageIcon(Config.PATH + "p_loja.png");
+		menu = new ImageIcon(Config.PATH + "menu.png");
 
 		itens[0] = new Item(Menu.Type.ENERGY);
 	}
@@ -99,7 +101,43 @@ public class Loja extends ElementModel {
 		}
 	}
 
-	public static void drawSelectionMenu(Graphics2D g, Item[] itens, int iSel) {
+	public void drawSelectionMenu(Graphics2D g, Item[] itens, int iSel) {
+		final int px = Engine.getIWindowGame().getWindowWidth() / 2 - menu.getIconWidth() / 2;
+		final int py = Engine.getIWindowGame().getWindowHeight() / 2 - menu.getIconHeight() / 2;
+
+		//g.fillRect(px, py, 500, 200);
+		g.drawImage(menu.getImage(), px, py, null);
+
+		final int s = 40;
+		for (int i = 0; i < itens.length; i++) {
+			g.setColor(Color.ORANGE);
+
+			if (i == iSel) {
+				g.fillRect(px + (i * s) + (20 * (i + 1)) + 5, py + 15 + 5, s - 9, s - 10);
+
+			}
+
+			if (itens[i] != null) {
+				g.drawRect(px + (i * s) + (20 * (i + 1)), py + 15, s, s);
+
+			} else {
+				g.setColor(Color.GREEN);
+				g.drawRect(px + (i * s) + (20 * (i + 1)), py + 15, s, s);
+			}
+
+		}
+
+		if (itens[iSel] != null) {
+			g.setColor(Color.BLACK);
+			g.drawString(itens[iSel].toString(), px + 20, py + 200 - 20);
+
+		} else {
+			g.setColor(Color.BLACK);
+			g.drawString("---", px + 20, py + 200 - 20);
+		}
+	}
+	
+	public static void _drawSelectionMenu(Graphics2D g, Item[] itens, int iSel) {
 		final int px = Engine.getIWindowGame().getWindowWidth() / 2 - 500 / 2;
 		final int py = Engine.getIWindowGame().getWindowHeight() / 2 - 200 / 2;
 

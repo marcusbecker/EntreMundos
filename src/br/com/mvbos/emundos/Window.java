@@ -16,7 +16,6 @@ import br.com.mvbos.jeg.element.ElementMovableModel;
 import br.com.mvbos.jeg.engine.Engine;
 import br.com.mvbos.jeg.engine.GameEngineModel;
 import br.com.mvbos.jeg.scene.IScene;
-import br.com.mvbos.jeg.scene.impl.SceneDefault;
 import br.com.mvbos.jeg.window.IWindowGame;
 
 public class Window extends JFrame implements IWindowGame {
