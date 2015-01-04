@@ -8,6 +8,7 @@ import javax.swing.ImageIcon;
 import br.com.mvbos.emundos.Config;
 import br.com.mvbos.emundos.data.Item;
 import br.com.mvbos.jeg.element.ElementModel;
+import br.com.mvbos.jeg.engine.Clicked;
 import br.com.mvbos.jeg.engine.KeysMap;
 import br.com.mvbos.jeg.engine.SpriteTool;
 import br.com.mvbos.jeg.window.Camera;
@@ -21,13 +22,6 @@ public class Player extends ElementModel {
 	int dir = 0; // direction
 	private boolean invert;
 	private State state = State.DEF;
-
-	// buttons
-	private boolean up;
-	private boolean down;
-	private boolean lft;
-	private boolean rgt;
-	private boolean bAction;
 
 	private int life;
 
@@ -47,51 +41,57 @@ public class Player extends ElementModel {
 	@Override
 	public void update() {
 
+		// TODO melhorar logica
+
+		if (state == Player.State.IN_CONTROLLER || state == Player.State.IN_PLACE) {
+			inMenu = false;
+
+		} else {
+			//TODO corrigir menu loja
+			if (Clicked.first(KeysMap.B0))
+				inMenu = !inMenu;
+		}
+
 		if (itemActive && itens[iSel] == null) {
 			itemActive = false;
 		}
 
 		if (inMenu) {
-			if (lft || rgt) {
-				iSel += lft ? -1 : +1;
+			if (Clicked.is(KeysMap.LEFT) || Clicked.is(KeysMap.RIGHT)) {
+				iSel += Clicked.is(KeysMap.LEFT) ? -1 : +1;
 				if (iSel < 0 || iSel == itens.length) {
 					iSel = iSel < 0 ? itens.length - 1 : 0;
 				}
 			}
 
-			if (bAction && itens[iSel] != null) {
+			if (Clicked.is(KeysMap.B1) && itens[iSel] != null) {
 				itemActive = !itemActive;
 			}
 
-			releaseControll();
+			Clicked.consumeAll();
 
 		} else {
-			if (getState() == State.IN) {
+			if (state == State.IN) {
 
-			} else if (getState() == State.IN_CONTROLLER) {
+			} else if (state == State.IN_CONTROLLER) {
+
+			} else if (state == Player.State.IN_PLACE) {
 
 			} else {
 
-				if (lft) {
+				if (Clicked.is(KeysMap.LEFT)) {
 					moveX(-velInc);
 
-				} else if (rgt) {
+				} else if (Clicked.is(KeysMap.RIGHT)) {
 					moveX(velInc);
 				}
 			}
+
+			if (state == State.DEF || state == State.IN) {
+				if (dir > 0)
+					dir--;
+			}
 		}
-
-		up = false;
-		down = false;
-		// lft = false;
-		// rgt = false;
-		bAction = false;
-
-		if (state == State.DEF || state == State.IN) {
-			if (dir > 0)
-				dir--;
-		}
-
 	}
 
 	public void moveX(int inc) {
@@ -182,60 +182,6 @@ public class Player extends ElementModel {
 
 	public void setState(State state) {
 		this.state = state;
-	}
-
-	public void press(KeysMap direction) {
-		if (getState() == Player.State.IN_CONTROLLER || getState() == Player.State.IN_PLACE) {
-			return;
-		}
-
-		switch (direction) {
-		case UP:
-			break;
-		case DOWN:
-			break;
-		case LEFT:
-			lft = true;
-			break;
-		case RIGHT:
-			rgt = true;
-			break;
-		case B0:
-			inMenu = !inMenu;
-			break;
-		case B1:
-			bAction = true;
-			break;
-		default:
-			break;
-		}
-	}
-
-	private void releaseControll() {
-		up = false;
-		down = false;
-		lft = false;
-		rgt = false;
-	}
-
-	public void release(KeysMap direction) {
-		bAction = false;
-		switch (direction) {
-		case UP:
-			up = false;
-			break;
-		case DOWN:
-			down = false;
-			break;
-		case LEFT:
-			lft = false;
-			break;
-		case RIGHT:
-			rgt = false;
-			break;
-		default:
-			break;
-		}
 	}
 
 	public void reposition(boolean invert, int px, int py) {

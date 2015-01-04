@@ -7,9 +7,12 @@ import javax.swing.ImageIcon;
 
 import br.com.mvbos.emundos.Config;
 import br.com.mvbos.emundos.data.Item;
+import br.com.mvbos.emundos.el.Player.State;
 import br.com.mvbos.emundos.sc.Planeta;
 import br.com.mvbos.jeg.element.ElementModel;
+import br.com.mvbos.jeg.engine.Clicked;
 import br.com.mvbos.jeg.engine.Engine;
+import br.com.mvbos.jeg.engine.GraphicTool;
 import br.com.mvbos.jeg.engine.KeysMap;
 import br.com.mvbos.jeg.engine.MathTool;
 import br.com.mvbos.jeg.engine.SpriteTool;
@@ -31,6 +34,7 @@ public class Loja extends ElementModel {
 	private int atPx = 0;
 	private boolean dir;
 	private boolean hold;
+	private Player p;
 
 	public Loja(Planeta planeta) {
 		this.planeta = planeta;
@@ -58,6 +62,41 @@ public class Loja extends ElementModel {
 
 		} else if (MathTool.r.nextInt(100) > 95) {
 			hold = false;
+		}
+
+		if (openMenu) {
+			if (Clicked.first(KeysMap.LEFT)) {
+				iSel--;
+			} else if (Clicked.first(KeysMap.RIGHT)) {
+				iSel++;
+			}
+
+		} else {
+			iSel = 0;
+		}
+
+		//TODO corrigir
+		if (p != null) {
+
+			if (Clicked.is(KeysMap.B0)) {
+				openMenu = !openMenu;
+				p.setInMenu(!openMenu);
+
+			} else if (openMenu && Clicked.is(KeysMap.B1) && getItem(iSel) != null) {
+				p.addItem(getItem(iSel));
+				removeItem(iSel);
+			}
+
+			p.setState(openMenu ? Player.State.IN_PLACE : Player.State.DEF);
+			p = null;
+		}
+
+		/*
+		 * if (l < 0 || l == itens.length) { l = l < 0 ? itens.length - 1 : 0; }
+		 */
+
+		if (iSel < 0 || iSel == itens.length) {
+			iSel = iSel < 0 ? itens.length - 1 : 0;
 		}
 
 		if (!openMenu && !hold) {
@@ -105,7 +144,7 @@ public class Loja extends ElementModel {
 		final int px = Engine.getIWindowGame().getWindowWidth() / 2 - menu.getIconWidth() / 2;
 		final int py = Engine.getIWindowGame().getWindowHeight() / 2 - menu.getIconHeight() / 2;
 
-		//g.fillRect(px, py, 500, 200);
+		// g.fillRect(px, py, 500, 200);
 		g.drawImage(menu.getImage(), px, py, null);
 
 		final int s = 40;
@@ -136,7 +175,7 @@ public class Loja extends ElementModel {
 			g.drawString("---", px + 20, py + 200 - 20);
 		}
 	}
-	
+
 	public static void _drawSelectionMenu(Graphics2D g, Item[] itens, int iSel) {
 		final int px = Engine.getIWindowGame().getWindowWidth() / 2 - 500 / 2;
 		final int py = Engine.getIWindowGame().getWindowHeight() / 2 - 200 / 2;
@@ -190,56 +229,8 @@ public class Loja extends ElementModel {
 		itens[i] = null;
 	}
 
-	public void press(KeysMap k) {
-		// int l = 0;
-		if (openMenu) {
-			switch (k) {
-			case UP:
-				// l++;
-				break;
-			case DOWN:
-				// l--;
-				break;
-			case LEFT:
-				iSel--;
-				break;
-			case RIGHT:
-				iSel++;
-				break;
-			default:
-				break;
-			}
-		} else {
-			iSel = 0;
-		}
-		Player p = planeta.getPlayer();
+	public void setPlayer(Player p) {
+		this.p = p;
 
-		switch (k) {
-		case B0:
-			openMenu = !openMenu;
-			p.setInMenu(!openMenu);
-			break;
-		case B1:
-			if (openMenu) {
-				if (getItem(iSel) != null) {
-					p.addItem(getItem(iSel));
-					removeItem(iSel);
-				}
-			}
-			break;
-		default:
-			break;
-		}
-
-		p.setState(openMenu ? Player.State.IN_PLACE : Player.State.DEF);
-
-		/*
-		 * if (l < 0 || l == itens.length) { l = l < 0 ? itens.length - 1 : 0; }
-		 */
-
-		if (iSel < 0 || iSel == itens.length) {
-			iSel = iSel < 0 ? itens.length - 1 : 0;
-		}
 	}
-
 }

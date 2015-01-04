@@ -17,7 +17,6 @@ import br.com.mvbos.jeg.engine.Clicked;
 import br.com.mvbos.jeg.engine.Engine;
 import br.com.mvbos.jeg.engine.GraphicTool;
 import br.com.mvbos.jeg.engine.KeysMap;
-import br.com.mvbos.jeg.scene.Click;
 import br.com.mvbos.jeg.scene.Pxy;
 import br.com.mvbos.jeg.scene.impl.SceneDefault;
 import br.com.mvbos.jeg.window.Camera;
@@ -127,7 +126,8 @@ public class Planeta extends SceneDefault {
 			temp = GraphicTool.g().collide(p, memo);
 
 			if (temp instanceof Loja) {
-				// p.setState(Player.State.IN_FOCUS);
+				((Loja) temp).setPlayer(p);
+				
 			} else {
 				p.setState(Player.State.DEF);
 			}
@@ -226,12 +226,9 @@ public class Planeta extends SceneDefault {
 			if (temp != null) {
 				if (temp instanceof Loja) {
 					// TODO dialogs and actions
-					((Loja) temp).press(k);
+					// ((Loja) temp).press(k);
 				}
 			}
-
-			p.press(k);
-			// n.press(k);
 
 		}
 	}
@@ -239,31 +236,19 @@ public class Planeta extends SceneDefault {
 	@Override
 	public void keyRelease(char keyChar, int keyCode) {
 		p.stop();
-		
+
 		KeysMap k = null;
 
 		if (isKey(keyChar, keyCode, 0)) {
-			//n.release(KeysMap.UP);
-			p.release(KeysMap.UP);
-			
 			k = KeysMap.UP;
 
 		} else if (isKey(keyChar, keyCode, 1)) {
-			//n.release(KeysMap.DOWN);
-			p.release(KeysMap.DOWN);
-			
 			k = KeysMap.DOWN;
 
 		} else if (isKey(keyChar, keyCode, 2)) {
-			//n.release(KeysMap.LEFT);
-			p.release(KeysMap.LEFT);
-			
 			k = KeysMap.LEFT;
 
 		} else if (isKey(keyChar, keyCode, 3)) {
-			//n.release(KeysMap.RIGHT);
-			p.release(KeysMap.RIGHT);
-			
 			k = KeysMap.RIGHT;
 
 		} else if (isKey(keyChar, keyCode, 4)) {
@@ -272,11 +257,12 @@ public class Planeta extends SceneDefault {
 		} else if (isKey(keyChar, keyCode, 5)) {
 			k = KeysMap.B1;
 		}
-		
+
 		CLICK_MAP.release(k);
 	}
 
 	public Player getPlayer() {
 		return p;
 	}
+
 }

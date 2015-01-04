@@ -58,16 +58,6 @@ public class Nave extends ElementModel {
 
 	boolean open;
 
-	/*
-	 * private boolean up;
-	 * 
-	 * private boolean down;
-	 * 
-	 * private boolean lft;
-	 * 
-	 * private boolean rgt;
-	 */
-
 	private boolean bAction;
 
 	@Override
@@ -453,24 +443,6 @@ public class Nave extends ElementModel {
 	public void setInvert(boolean invert) {
 		this.invert = invert;
 	}
-
-	/*
-	 * public void press(KeysMap direction) { bAction = false;
-	 * 
-	 * switch (direction) { case UP: up = true; down = false; break; case DOWN:
-	 * down = true; up = false; break; case LEFT: lft = true; rgt = false;
-	 * break; case RIGHT: rgt = true; lft = false; break; case B0: break; case
-	 * B1: bAction = true; default: break; } }
-	 */
-
-	/*
-	 * public void release(KeysMap direction) { bAction = false; if
-	 * (!naveControl.isActive()) { return; }
-	 * 
-	 * switch (direction) { case UP: up = false; break; case DOWN: down = false;
-	 * break; case LEFT: lft = false; break; case RIGHT: rgt = false; break;
-	 * default: break; } }
-	 */
 
 	public void setPlaces(NavePlaces np) {
 		this.places = np;
