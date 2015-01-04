@@ -9,6 +9,7 @@ import br.com.mvbos.emundos.Config;
 import br.com.mvbos.emundos.data.NavePlaces;
 import br.com.mvbos.emundos.sc.Planeta;
 import br.com.mvbos.jeg.element.ElementModel;
+import br.com.mvbos.jeg.engine.Clicked;
 import br.com.mvbos.jeg.engine.Engine;
 import br.com.mvbos.jeg.engine.GraphicTool;
 import br.com.mvbos.jeg.engine.KeysMap;
@@ -57,13 +58,15 @@ public class Nave extends ElementModel {
 
 	boolean open;
 
-	private boolean up;
-
-	private boolean down;
-
-	private boolean lft;
-
-	private boolean rgt;
+	/*
+	 * private boolean up;
+	 * 
+	 * private boolean down;
+	 * 
+	 * private boolean lft;
+	 * 
+	 * private boolean rgt;
+	 */
 
 	private boolean bAction;
 
@@ -103,7 +106,7 @@ public class Nave extends ElementModel {
 			repCont(naveControl);
 			repCont(energy);
 
-			bAction = bAction && !player.isInMenu();
+			bAction = Clicked.is(KeysMap.B1) && !player.isInMenu();
 
 			if (player.getState() == Player.State.DEF) {
 				open = true;
@@ -202,7 +205,9 @@ public class Nave extends ElementModel {
 		bar.update();
 		bar.setVisible(player != null);
 
-		bAction = false;
+		// bAction = false;
+		// Force consume event
+		Clicked.consume(KeysMap.B1);
 	}
 
 	/**
@@ -237,10 +242,9 @@ public class Nave extends ElementModel {
 	 * Force release keys
 	 */
 	private void releaseControll() {
-		up = false;
-		down = false;
-		lft = false;
-		rgt = false;
+		/*
+		 * up = false; down = false; lft = false; rgt = false;
+		 */
 	}
 
 	private void keyUpdateShip() {
@@ -250,7 +254,7 @@ public class Nave extends ElementModel {
 
 		if (readyToFly()) {
 
-			if (!collideTop && naveControl.isActive() && up) {
+			if (!collideTop && naveControl.isActive() && Clicked.is(KeysMap.UP)) {
 				if (on && velRise < velRiseMax) {
 					velRise += velRiseInc;
 				}
@@ -258,7 +262,7 @@ public class Nave extends ElementModel {
 				open = false;
 				on = true;
 
-			} else if (naveControl.isActive() && down) {
+			} else if (naveControl.isActive() && Clicked.is(KeysMap.DOWN)) {
 				open = false;
 				if (velRise > -velRiseMax) {
 					velRise -= velRiseInc * 2f;
@@ -293,13 +297,13 @@ public class Nave extends ElementModel {
 
 		if (!collideBottom) {
 			if (on) {
-				if (naveControl.isActive() && lft) {
+				if (naveControl.isActive() && Clicked.is(KeysMap.LEFT)) {
 					open = false;
 					if (_vel < velMax) {
 						_vel += velInc;
 					}
 
-				} else if (naveControl.isActive() && rgt) {
+				} else if (naveControl.isActive() && Clicked.is(KeysMap.RIGHT)) {
 					open = false;
 					if (_vel > -velMax) {
 						_vel -= velInc;
@@ -350,20 +354,20 @@ public class Nave extends ElementModel {
 
 		player.incPx(-_vel);
 
-		if (up) {
+		if (Clicked.is(KeysMap.UP)) {
 			// player.incPy(-velRise);
-		} else if (down) {
+		} else if (Clicked.is(KeysMap.DOWN)) {
 			// player.incPy(-velRise);
 		}
 
-		if (lft) {
+		if (Clicked.is(KeysMap.LEFT)) {
 			if (on && player.getPx() - player.velInc - (invert ? FRONT_LIMIT : BACK_LIMIT) < getPx()) {
 				player.stop();
 			} else {
 				player.moveX(-player.velInc);
 			}
 
-		} else if (rgt) {
+		} else if (Clicked.is(KeysMap.RIGHT)) {
 			if (on && player.getAllWidth() + player.velInc + (invert ? BACK_LIMIT : FRONT_LIMIT) > getAllWidth()) {
 				player.stop();
 			} else {
@@ -421,7 +425,7 @@ public class Nave extends ElementModel {
 				if (velRise >= -velRiseMax) {
 					s = SpriteTool.s(fogo).matriz(5, 1).invert(false);
 					s.draw(g, Camera.c().fx(getPx()) + 25, Camera.c().fy(getAllHeight() - 21),
-							down ? MathTool.r.nextInt(2) : SpriteTool.SORT, 0);
+							Clicked.is(KeysMap.DOWN) ? MathTool.r.nextInt(2) : SpriteTool.SORT, 0);
 				}
 			}
 		}
@@ -450,58 +454,23 @@ public class Nave extends ElementModel {
 		this.invert = invert;
 	}
 
-	public void press(KeysMap direction) {
-		bAction = false;
+	/*
+	 * public void press(KeysMap direction) { bAction = false;
+	 * 
+	 * switch (direction) { case UP: up = true; down = false; break; case DOWN:
+	 * down = true; up = false; break; case LEFT: lft = true; rgt = false;
+	 * break; case RIGHT: rgt = true; lft = false; break; case B0: break; case
+	 * B1: bAction = true; default: break; } }
+	 */
 
-		switch (direction) {
-		case UP:
-			up = true;
-			down = false;
-			break;
-		case DOWN:
-			down = true;
-			up = false;
-			break;
-		case LEFT:
-			lft = true;
-			rgt = false;
-			break;
-		case RIGHT:
-			rgt = true;
-			lft = false;
-			break;
-		case B0:
-			break;
-		case B1:
-			bAction = true;
-		default:
-			break;
-		}
-	}
-
-	public void release(KeysMap direction) {
-		bAction = false;
-		if (!naveControl.isActive()) {
-			return;
-		}
-
-		switch (direction) {
-		case UP:
-			up = false;
-			break;
-		case DOWN:
-			down = false;
-			break;
-		case LEFT:
-			lft = false;
-			break;
-		case RIGHT:
-			rgt = false;
-			break;
-		default:
-			break;
-		}
-	}
+	/*
+	 * public void release(KeysMap direction) { bAction = false; if
+	 * (!naveControl.isActive()) { return; }
+	 * 
+	 * switch (direction) { case UP: up = false; break; case DOWN: down = false;
+	 * break; case LEFT: lft = false; break; case RIGHT: rgt = false; break;
+	 * default: break; } }
+	 */
 
 	public void setPlaces(NavePlaces np) {
 		this.places = np;

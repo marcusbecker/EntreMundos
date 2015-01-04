@@ -9,6 +9,8 @@ import br.com.mvbos.jeg.window.Camera;
 
 public class BackgroundElement extends ElementModel {
 
+	//TODO criar versao pre-load
+	
 	@Override
 	public void loadElement() {
 		setSize(getImage().getIconWidth(), getImage().getIconHeight());
