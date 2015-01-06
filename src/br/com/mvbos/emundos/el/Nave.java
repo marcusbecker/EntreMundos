@@ -96,7 +96,7 @@ public class Nave extends ElementModel {
 			repCont(naveControl);
 			repCont(energy);
 
-			bAction = Clicked.is(KeysMap.B1) && !player.isInMenu();
+			bAction = Clicked.first(KeysMap.B1) && !player.isInMenu();
 
 			if (player.getState() == Player.State.DEF) {
 				open = true;
@@ -195,9 +195,6 @@ public class Nave extends ElementModel {
 		bar.update();
 		bar.setVisible(player != null);
 
-		// bAction = false;
-		// Force consume event
-		Clicked.consume(KeysMap.B1);
 	}
 
 	/**

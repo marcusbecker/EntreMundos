@@ -38,18 +38,30 @@ public class Player extends ElementModel {
 		setImage(new ImageIcon(Config.PATH + "p.png"));
 	}
 
+	State old;
+	private boolean hideMenu;
+
 	@Override
 	public void update() {
 
-		// TODO melhorar logica
+		if (state != old) {
+			old = state;
+			System.out.println("old " + state);
+		}
 
-		if (state == Player.State.IN_CONTROLLER || state == Player.State.IN_PLACE) {
-			inMenu = false;
+		/*
+		 * State.DEF = Pode se mover esq, dir e abrir menu State.IN = Pode abrir
+		 * menu e interagir com a nave, o movimento fica por conta da nave
+		 * devido aos ajustes de posicao
+		 * State.IN_PLACE = ignora movimentos
+		 */
 
-		} else {
-			//TODO corrigir menu loja
-			if (Clicked.first(KeysMap.B0))
+		if (state == State.DEF || state == State.IN) {
+			if (Clicked.is(KeysMap.B0) && !hideMenu) {
 				inMenu = !inMenu;
+				Clicked.consume(KeysMap.B0);
+			}
+
 		}
 
 		if (itemActive && itens[iSel] == null) {
@@ -57,48 +69,30 @@ public class Player extends ElementModel {
 		}
 
 		if (inMenu) {
-			if (Clicked.is(KeysMap.LEFT) || Clicked.is(KeysMap.RIGHT)) {
-				iSel += Clicked.is(KeysMap.LEFT) ? -1 : +1;
-				if (iSel < 0 || iSel == itens.length) {
-					iSel = iSel < 0 ? itens.length - 1 : 0;
-				}
-			}
+			if (Clicked.is(KeysMap.LEFT) || Clicked.first(KeysMap.RIGHT)) {
+				iSel = Item.next(Clicked.first(KeysMap.LEFT), iSel, itens.length);
 
-			if (Clicked.is(KeysMap.B1) && itens[iSel] != null) {
+			} else if (Clicked.first(KeysMap.B1) && itens[iSel] != null) {
 				itemActive = !itemActive;
 			}
 
-			Clicked.consumeAll();
+			// Clicked.consumeAll();
 
-		} else {
-			if (state == State.IN) {
+		} else if (state == State.DEF) {
+			if (Clicked.is(KeysMap.LEFT)) {
+				moveX(-velInc);
 
-			} else if (state == State.IN_CONTROLLER) {
-
-			} else if (state == Player.State.IN_PLACE) {
-
-			} else {
-
-				if (Clicked.is(KeysMap.LEFT)) {
-					moveX(-velInc);
-
-				} else if (Clicked.is(KeysMap.RIGHT)) {
-					moveX(velInc);
-				}
-			}
-
-			if (state == State.DEF || state == State.IN) {
-				if (dir > 0)
-					dir--;
+			} else if (Clicked.is(KeysMap.RIGHT)) {
+				moveX(velInc);
 			}
 		}
+
+		/*
+		 * if (state == State.DEF || state == State.IN) { if (dir > 0) dir--; }
+		 */
 	}
 
 	public void moveX(int inc) {
-		if (inMenu) {
-			return;
-		}
-
 		setDirection(inc < 0);
 		incPx(inc);
 	}
@@ -121,6 +115,7 @@ public class Player extends ElementModel {
 			int line = 0;
 
 			if (state == State.DEF || state == State.IN) {
+
 				if (dir == 0) {
 					col = 0;
 
@@ -240,6 +235,10 @@ public class Player extends ElementModel {
 
 	public void removeItemActive() {
 		itens[iSel] = null;
+	}
+
+	public void hideMenu(boolean hideMenu) {
+		this.hideMenu = hideMenu;
 	}
 
 }

@@ -7,12 +7,9 @@ import javax.swing.ImageIcon;
 
 import br.com.mvbos.emundos.Config;
 import br.com.mvbos.emundos.data.Item;
-import br.com.mvbos.emundos.el.Player.State;
-import br.com.mvbos.emundos.sc.Planeta;
 import br.com.mvbos.jeg.element.ElementModel;
 import br.com.mvbos.jeg.engine.Clicked;
 import br.com.mvbos.jeg.engine.Engine;
-import br.com.mvbos.jeg.engine.GraphicTool;
 import br.com.mvbos.jeg.engine.KeysMap;
 import br.com.mvbos.jeg.engine.MathTool;
 import br.com.mvbos.jeg.engine.SpriteTool;
@@ -21,7 +18,6 @@ import br.com.mvbos.jeg.window.Camera;
 public class Loja extends ElementModel {
 
 	private Item[] itens = new Item[5];
-	private Planeta planeta;
 
 	private int iSel;
 
@@ -35,10 +31,6 @@ public class Loja extends ElementModel {
 	private boolean dir;
 	private boolean hold;
 	private Player p;
-
-	public Loja(Planeta planeta) {
-		this.planeta = planeta;
-	}
 
 	@Override
 	public void loadElement() {
@@ -64,40 +56,39 @@ public class Loja extends ElementModel {
 			hold = false;
 		}
 
-		if (openMenu) {
-			if (Clicked.first(KeysMap.LEFT)) {
-				iSel--;
-			} else if (Clicked.first(KeysMap.RIGHT)) {
-				iSel++;
+		if (p != null) {
+			if (Clicked.first(KeysMap.B0)) {
+				openMenu = !openMenu;
+				// Clicked.consume(KeysMap.B0);
 			}
 
-		} else {
-			iSel = 0;
-		}
+			if (openMenu) {
+				if (Clicked.first(KeysMap.LEFT)) {
+					iSel = Item.next(true, iSel, itens.length);
 
-		//TODO corrigir
-		if (p != null) {
+				} else if (Clicked.first(KeysMap.RIGHT)) {
+					iSel = Item.next(false, iSel, itens.length);
 
-			if (Clicked.is(KeysMap.B0)) {
-				openMenu = !openMenu;
-				p.setInMenu(!openMenu);
+				} else if (Clicked.is(KeysMap.B1) && getItem(iSel) != null) {
+					p.addItem(getItem(iSel));
+					removeItem(iSel);
+				}
 
-			} else if (openMenu && Clicked.is(KeysMap.B1) && getItem(iSel) != null) {
-				p.addItem(getItem(iSel));
-				removeItem(iSel);
 			}
 
 			p.setState(openMenu ? Player.State.IN_PLACE : Player.State.DEF);
+
+			p.hideMenu(false);
 			p = null;
+
+		} else {
+			iSel = 0;
+			openMenu = false;
 		}
 
 		/*
 		 * if (l < 0 || l == itens.length) { l = l < 0 ? itens.length - 1 : 0; }
 		 */
-
-		if (iSel < 0 || iSel == itens.length) {
-			iSel = iSel < 0 ? itens.length - 1 : 0;
-		}
 
 		if (!openMenu && !hold) {
 			if (!dir && atPx < (getAllWidth() - 25)) {
@@ -112,6 +103,7 @@ public class Loja extends ElementModel {
 				dir = false;
 			}
 		}
+
 	}
 
 	@Override
@@ -231,6 +223,6 @@ public class Loja extends ElementModel {
 
 	public void setPlayer(Player p) {
 		this.p = p;
-
+		p.hideMenu(true);
 	}
 }

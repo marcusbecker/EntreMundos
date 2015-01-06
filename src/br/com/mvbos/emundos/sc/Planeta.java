@@ -62,7 +62,7 @@ public class Planeta extends SceneDefault {
 		np.setEnergy(new Pxy(30, 0));
 		n.setPlaces(np);
 
-		Loja loja = new Loja(this);
+		Loja loja = new Loja(/*this*/);
 		loja.setSize(170, 140);
 
 		for (int i = 1; i < 40; i++) {
@@ -129,7 +129,7 @@ public class Planeta extends SceneDefault {
 				((Loja) temp).setPlayer(p);
 				
 			} else {
-				p.setState(Player.State.DEF);
+				//p.setState(Player.State.DEF);
 			}
 		}
 
@@ -221,16 +221,6 @@ public class Planeta extends SceneDefault {
 		}
 
 		CLICK_MAP.press(k);
-
-		if (k != null) {
-			if (temp != null) {
-				if (temp instanceof Loja) {
-					// TODO dialogs and actions
-					// ((Loja) temp).press(k);
-				}
-			}
-
-		}
 	}
 
 	@Override
