@@ -13,7 +13,7 @@ import br.com.mvbos.emundos.el.Loja;
 import br.com.mvbos.emundos.el.Nave;
 import br.com.mvbos.emundos.el.Player;
 import br.com.mvbos.jeg.element.ElementModel;
-import br.com.mvbos.jeg.engine.Clicked;
+import br.com.mvbos.jeg.engine.JoyPad;
 import br.com.mvbos.jeg.engine.Engine;
 import br.com.mvbos.jeg.engine.GraphicTool;
 import br.com.mvbos.jeg.engine.KeysMap;
@@ -24,8 +24,6 @@ import br.com.mvbos.jeg.window.impl.MemoryImpl;
 
 public class Planeta extends SceneDefault {
 
-	private static final Clicked CLICK_MAP = new Clicked();
-
 	private static final GraphicTool G = GraphicTool.g();
 
 	private Player p;
@@ -34,10 +32,6 @@ public class Planeta extends SceneDefault {
 	// private final ElementModel BLANK = new ElementModel();
 
 	private ElementModel temp;
-
-	// cima, baixo, esq, dir, Q, E
-	private int[] keysCode = { 38, 40, 37, 39, 81, 69 };
-	private char[] keysChar = { 'w', 's', 'a', 'd', 'q', 'e' };
 
 	private ImageIcon bg; // background
 	private ImageIcon bt; // bottom
@@ -50,19 +44,24 @@ public class Planeta extends SceneDefault {
 
 	public static int base = 75;
 
+	private final JoyPad pad = new JoyPad(new int[] { 38, 40, 37, 39, 81, 69 }, new char[] { 'w', 's', 'a', 'd', 'q',
+			'e' });
+
 	@Override
 	public boolean startScene() {
+
 		memo = new MemoryImpl(90);
 
 		n = new Nave();
 		p = new Player();
+		p.setControl(pad);
 
 		NavePlaces np = new NavePlaces();// config externa
 		np.setControl(new Pxy(55, 0));
 		np.setEnergy(new Pxy(30, 0));
 		n.setPlaces(np);
 
-		Loja loja = new Loja(/*this*/);
+		Loja loja = new Loja(/* this */);
 		loja.setSize(170, 140);
 
 		for (int i = 1; i < 40; i++) {
@@ -89,7 +88,7 @@ public class Planeta extends SceneDefault {
 		bg = new ImageIcon(Config.PATH + "bg_space.png");
 		bt = new ImageIcon(Config.PATH + "p01/bt.png");
 
-		fbg = new BackgroundElement();
+		fbg = new BackgroundElement(false);
 		fbg.setImage(new ImageIcon(Config.PATH + "p01/fnd.png"));
 		fbg.loadElement();
 		// sbg = new BackgroundElement();
@@ -102,7 +101,9 @@ public class Planeta extends SceneDefault {
 
 		Camera.c().config(w, h).rollY(Planeta.h - Engine.getIWindowGame().getCanvasHeight());
 		// System.out.println(Camera.c());
-
+		
+		fbg.update();
+		
 		return true;
 	}
 
@@ -113,6 +114,8 @@ public class Planeta extends SceneDefault {
 
 	@Override
 	public void update() {
+		
+		
 		if (G.collide(p, n) != null) {
 			n.setPlayer(p);
 			p.inShip();
@@ -127,9 +130,9 @@ public class Planeta extends SceneDefault {
 
 			if (temp instanceof Loja) {
 				((Loja) temp).setPlayer(p);
-				
+
 			} else {
-				//p.setState(Player.State.DEF);
+				// p.setState(Player.State.DEF);
 			}
 		}
 
@@ -142,6 +145,7 @@ public class Planeta extends SceneDefault {
 		} else {
 			Camera.c().center(p);
 		}
+
 	}
 
 	@Override
@@ -192,35 +196,30 @@ public class Planeta extends SceneDefault {
 		// sbg.drawMe(g);
 	}
 
-	private boolean isKey(char keyChar, int keyCode, int idKeyMap) {
-		return Character.toLowerCase(keyChar) == Character.toLowerCase(keysChar[idKeyMap])
-				|| keyCode == keysCode[idKeyMap];
-	}
-
 	@Override
 	public void keyEvent(char keyChar, int keyCode) {
 		KeysMap k = null;
 
-		if (isKey(keyChar, keyCode, 0)) {
+		if (pad.isKey(keyChar, keyCode, 0)) {
 			k = KeysMap.UP;
 
-		} else if (isKey(keyChar, keyCode, 1)) {
+		} else if (pad.isKey(keyChar, keyCode, 1)) {
 			k = KeysMap.DOWN;
 
-		} else if (isKey(keyChar, keyCode, 2)) {
+		} else if (pad.isKey(keyChar, keyCode, 2)) {
 			k = KeysMap.LEFT;
 
-		} else if (isKey(keyChar, keyCode, 3)) {
+		} else if (pad.isKey(keyChar, keyCode, 3)) {
 			k = KeysMap.RIGHT;
 
-		} else if (isKey(keyChar, keyCode, 4)) {
+		} else if (pad.isKey(keyChar, keyCode, 4)) {
 			k = KeysMap.B0;
 
-		} else if (isKey(keyChar, keyCode, 5)) {
+		} else if (pad.isKey(keyChar, keyCode, 5)) {
 			k = KeysMap.B1;
 		}
 
-		CLICK_MAP.press(k);
+		pad.press(k);
 	}
 
 	@Override
@@ -229,26 +228,26 @@ public class Planeta extends SceneDefault {
 
 		KeysMap k = null;
 
-		if (isKey(keyChar, keyCode, 0)) {
+		if (pad.isKey(keyChar, keyCode, 0)) {
 			k = KeysMap.UP;
 
-		} else if (isKey(keyChar, keyCode, 1)) {
+		} else if (pad.isKey(keyChar, keyCode, 1)) {
 			k = KeysMap.DOWN;
 
-		} else if (isKey(keyChar, keyCode, 2)) {
+		} else if (pad.isKey(keyChar, keyCode, 2)) {
 			k = KeysMap.LEFT;
 
-		} else if (isKey(keyChar, keyCode, 3)) {
+		} else if (pad.isKey(keyChar, keyCode, 3)) {
 			k = KeysMap.RIGHT;
 
-		} else if (isKey(keyChar, keyCode, 4)) {
+		} else if (pad.isKey(keyChar, keyCode, 4)) {
 			k = KeysMap.B0;
 
-		} else if (isKey(keyChar, keyCode, 5)) {
+		} else if (pad.isKey(keyChar, keyCode, 5)) {
 			k = KeysMap.B1;
 		}
 
-		CLICK_MAP.release(k);
+		pad.release(k);
 	}
 
 	public Player getPlayer() {

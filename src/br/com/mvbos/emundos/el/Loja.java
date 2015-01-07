@@ -8,7 +8,6 @@ import javax.swing.ImageIcon;
 import br.com.mvbos.emundos.Config;
 import br.com.mvbos.emundos.data.Item;
 import br.com.mvbos.jeg.element.ElementModel;
-import br.com.mvbos.jeg.engine.Clicked;
 import br.com.mvbos.jeg.engine.Engine;
 import br.com.mvbos.jeg.engine.KeysMap;
 import br.com.mvbos.jeg.engine.MathTool;
@@ -57,19 +56,19 @@ public class Loja extends ElementModel {
 		}
 
 		if (p != null) {
-			if (Clicked.first(KeysMap.B0)) {
+			if (p.getPad().first(KeysMap.B0)) {
 				openMenu = !openMenu;
 				// Clicked.consume(KeysMap.B0);
 			}
 
 			if (openMenu) {
-				if (Clicked.first(KeysMap.LEFT)) {
+				if (p.getPad().first(KeysMap.LEFT)) {
 					iSel = Item.next(true, iSel, itens.length);
 
-				} else if (Clicked.first(KeysMap.RIGHT)) {
+				} else if (p.getPad().first(KeysMap.RIGHT)) {
 					iSel = Item.next(false, iSel, itens.length);
 
-				} else if (Clicked.is(KeysMap.B1) && getItem(iSel) != null) {
+				} else if (p.getPad().is(KeysMap.B1) && getItem(iSel) != null) {
 					p.addItem(getItem(iSel));
 					removeItem(iSel);
 				}

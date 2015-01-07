@@ -8,7 +8,7 @@ import javax.swing.ImageIcon;
 import br.com.mvbos.emundos.Config;
 import br.com.mvbos.emundos.data.Item;
 import br.com.mvbos.jeg.element.ElementModel;
-import br.com.mvbos.jeg.engine.Clicked;
+import br.com.mvbos.jeg.engine.JoyPad;
 import br.com.mvbos.jeg.engine.KeysMap;
 import br.com.mvbos.jeg.engine.SpriteTool;
 import br.com.mvbos.jeg.window.Camera;
@@ -40,6 +40,7 @@ public class Player extends ElementModel {
 
 	State old;
 	private boolean hideMenu;
+	private JoyPad pad;
 
 	@Override
 	public void update() {
@@ -52,14 +53,13 @@ public class Player extends ElementModel {
 		/*
 		 * State.DEF = Pode se mover esq, dir e abrir menu State.IN = Pode abrir
 		 * menu e interagir com a nave, o movimento fica por conta da nave
-		 * devido aos ajustes de posicao
-		 * State.IN_PLACE = ignora movimentos
+		 * devido aos ajustes de posicao State.IN_PLACE = ignora movimentos
 		 */
 
 		if (state == State.DEF || state == State.IN) {
-			if (Clicked.is(KeysMap.B0) && !hideMenu) {
+			if (pad.is(KeysMap.B0) && !hideMenu) {
 				inMenu = !inMenu;
-				Clicked.consume(KeysMap.B0);
+				pad.consume(KeysMap.B0);
 			}
 
 		}
@@ -69,20 +69,20 @@ public class Player extends ElementModel {
 		}
 
 		if (inMenu) {
-			if (Clicked.is(KeysMap.LEFT) || Clicked.first(KeysMap.RIGHT)) {
-				iSel = Item.next(Clicked.first(KeysMap.LEFT), iSel, itens.length);
+			if (pad.is(KeysMap.LEFT) || pad.first(KeysMap.RIGHT)) {
+				iSel = Item.next(pad.first(KeysMap.LEFT), iSel, itens.length);
 
-			} else if (Clicked.first(KeysMap.B1) && itens[iSel] != null) {
+			} else if (pad.first(KeysMap.B1) && itens[iSel] != null) {
 				itemActive = !itemActive;
 			}
 
 			// Clicked.consumeAll();
 
 		} else if (state == State.DEF) {
-			if (Clicked.is(KeysMap.LEFT)) {
+			if (pad.is(KeysMap.LEFT)) {
 				moveX(-velInc);
 
-			} else if (Clicked.is(KeysMap.RIGHT)) {
+			} else if (pad.is(KeysMap.RIGHT)) {
 				moveX(velInc);
 			}
 		}
@@ -239,6 +239,15 @@ public class Player extends ElementModel {
 
 	public void hideMenu(boolean hideMenu) {
 		this.hideMenu = hideMenu;
+	}
+
+	public JoyPad getPad() {
+		return pad;
+	}
+
+	public void setControl(JoyPad pad) {
+		this.pad = pad;
+
 	}
 
 }

@@ -9,7 +9,6 @@ import br.com.mvbos.emundos.Config;
 import br.com.mvbos.emundos.data.NavePlaces;
 import br.com.mvbos.emundos.sc.Planeta;
 import br.com.mvbos.jeg.element.ElementModel;
-import br.com.mvbos.jeg.engine.Clicked;
 import br.com.mvbos.jeg.engine.Engine;
 import br.com.mvbos.jeg.engine.GraphicTool;
 import br.com.mvbos.jeg.engine.KeysMap;
@@ -96,7 +95,7 @@ public class Nave extends ElementModel {
 			repCont(naveControl);
 			repCont(energy);
 
-			bAction = Clicked.first(KeysMap.B1) && !player.isInMenu();
+			bAction = player.getPad().first(KeysMap.B1) && !player.isInMenu();
 
 			if (player.getState() == Player.State.DEF) {
 				open = true;
@@ -241,7 +240,7 @@ public class Nave extends ElementModel {
 
 		if (readyToFly()) {
 
-			if (!collideTop && naveControl.isActive() && Clicked.is(KeysMap.UP)) {
+			if (!collideTop && naveControl.isActive() && player.getPad().is(KeysMap.UP)) {
 				if (on && velRise < velRiseMax) {
 					velRise += velRiseInc;
 				}
@@ -249,7 +248,7 @@ public class Nave extends ElementModel {
 				open = false;
 				on = true;
 
-			} else if (naveControl.isActive() && Clicked.is(KeysMap.DOWN)) {
+			} else if (naveControl.isActive() && player.getPad().is(KeysMap.DOWN)) {
 				open = false;
 				if (velRise > -velRiseMax) {
 					velRise -= velRiseInc * 2f;
@@ -284,13 +283,13 @@ public class Nave extends ElementModel {
 
 		if (!collideBottom) {
 			if (on) {
-				if (naveControl.isActive() && Clicked.is(KeysMap.LEFT)) {
+				if (naveControl.isActive() && player.getPad().is(KeysMap.LEFT)) {
 					open = false;
 					if (_vel < velMax) {
 						_vel += velInc;
 					}
 
-				} else if (naveControl.isActive() && Clicked.is(KeysMap.RIGHT)) {
+				} else if (naveControl.isActive() && player.getPad().is(KeysMap.RIGHT)) {
 					open = false;
 					if (_vel > -velMax) {
 						_vel -= velInc;
@@ -341,20 +340,20 @@ public class Nave extends ElementModel {
 
 		player.incPx(-_vel);
 
-		if (Clicked.is(KeysMap.UP)) {
+		if (player.getPad().is(KeysMap.UP)) {
 			// player.incPy(-velRise);
-		} else if (Clicked.is(KeysMap.DOWN)) {
+		} else if (player.getPad().is(KeysMap.DOWN)) {
 			// player.incPy(-velRise);
 		}
 
-		if (Clicked.is(KeysMap.LEFT)) {
+		if (player.getPad().is(KeysMap.LEFT)) {
 			if (on && player.getPx() - player.velInc - (invert ? FRONT_LIMIT : BACK_LIMIT) < getPx()) {
 				player.stop();
 			} else {
 				player.moveX(-player.velInc);
 			}
 
-		} else if (Clicked.is(KeysMap.RIGHT)) {
+		} else if (player.getPad().is(KeysMap.RIGHT)) {
 			if (on && player.getAllWidth() + player.velInc + (invert ? BACK_LIMIT : FRONT_LIMIT) > getAllWidth()) {
 				player.stop();
 			} else {
@@ -412,7 +411,7 @@ public class Nave extends ElementModel {
 				if (velRise >= -velRiseMax) {
 					s = SpriteTool.s(fogo).matriz(5, 1).invert(false);
 					s.draw(g, Camera.c().fx(getPx()) + 25, Camera.c().fy(getAllHeight() - 21),
-							Clicked.is(KeysMap.DOWN) ? MathTool.r.nextInt(2) : SpriteTool.SORT, 0);
+							player.getPad().is(KeysMap.DOWN) ? MathTool.r.nextInt(2) : SpriteTool.SORT, 0);
 				}
 			}
 		}
