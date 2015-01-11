@@ -30,8 +30,8 @@ public class BackgroundElement extends ElementModel {
 
 		if (!useLoop) {
 			total = (short) Math.round((float) Planeta.w / getWidth());
-			System.out.printf("%s div %s\n", Planeta.w, getWidth());
-			System.out.println("Total = " + total);
+			//System.out.printf("%s div %s\n", Planeta.w, getWidth());
+			//System.out.println("Total = " + total);
 		}
 	}
 

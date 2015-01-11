@@ -171,6 +171,10 @@ public class Player extends ElementModel {
 		this.dir = 0;
 	}
 
+	public int getLife() {
+		return life;
+	}
+
 	public State getState() {
 		return state;
 	}

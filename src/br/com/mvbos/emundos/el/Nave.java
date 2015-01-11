@@ -28,9 +28,10 @@ public class Nave extends ElementModel {
 
 	private Player player;
 
-	private NavePlaces places;
-	private Menu naveControl;
-	private Menu energy;
+	private NavePlaces naveControl;
+
+	private NavePlaces[] np = new NavePlaces[5];
+
 	private BarraStatus bar;
 
 	private boolean invert;
@@ -66,14 +67,17 @@ public class Nave extends ElementModel {
 
 		fogo = new ImageIcon(Config.PATH + "fogo.png");
 
-		naveControl = new Menu(0, 0, 1, 1);
-		naveControl.setNave(this);
-		naveControl.loadElement();
+		/*
+		 * naveControl = new Menu(0, 0, 1, 1); naveControl.setNave(this);
+		 * naveControl.loadElement();
+		 */
 
-		energy = new Menu(0, 0, 5, 1);
-		energy.setNave(this);
-		energy.setType(Menu.Type.ENERGY);
-		energy.loadElement();
+		np[0] = new NavePlaces(true, 30, 60, Menu.Type.ENERGY);
+		np[1] = new NavePlaces(true, 50, 60, Menu.Type.NAV);
+
+		np[0].setMenu(new Menu(true, Menu.Type.ENERGY, 5));
+		np[1].setMenu(new Menu(true, Menu.Type.NAV, 5));
+		naveControl = np[1];
 
 		bar = new BarraStatus(Engine.getIWindowGame().getCanvasWidth() - 110, 10, 100, 15);
 		bar.loadElement();
@@ -83,17 +87,15 @@ public class Nave extends ElementModel {
 	public void update() {
 
 		keyUpdateShip();
-		keyUpdatePlayer();
 
 		// reset controls
-		naveControl.setVisible(false);
-		energy.setVisible(false);
-		// naveControl.update();
+		np[0].getMenu().setVisible(false);
+		np[1].getMenu().setVisible(false);
 
 		if (player != null) {
 
-			repCont(naveControl);
-			repCont(energy);
+			repContAll();
+			keyUpdatePlayer();
 
 			bAction = player.getPad().first(KeysMap.B1) && !player.isInMenu();
 
@@ -105,47 +107,44 @@ public class Nave extends ElementModel {
 				player.setPy(getAllHeight() - player.getHeight());
 
 			} else if (player.getState() == Player.State.IN_CONTROLLER) {
-				player.setPxy(naveControl.getPx() - 5, naveControl.getAllHeight() - player.getHeight());
+				if (player.getPad().first(KeysMap.B2)) {
+					invert = !invert;
+				}
 
+				player.reposition(invert, naveControl.getMenu().getPx(), getPy() + naveControl.getPy() - player.getHeight());
 			}
 
 			player.setVisible(open);
 
-			if (naveControl.isActive() || GraphicTool.g().collide(player, naveControl) != null) {
+			for (NavePlaces p : np) {
 
-				naveControl.setVisible(player.getState() != Player.State.IN_CONTROLLER);
+				if (p == null || !p.haveActiveMenu() || !GraphicTool.g().bcollide(player, p.getMenu()))
+					continue;
 
-				if (bAction) {
+				if (p.getType() == Menu.Type.NAV /* && inControl() */) {
+					p.getMenu().setVisible(player.getState() != Player.State.IN_CONTROLLER);
 
-					if (naveControl.isActive()) {
-						player.reposition(isInvert(), player.getPx(), naveControl.getAllHeight() - player.getHeight());
+					if (!bAction)
+						continue;
 
+					if (inControl()) {
+						player.reposition(invert, np[1].getMenu().getPx() - 5, getPy() + np[1].getPy() - player.getHeight());
 						player.setState(Player.State.IN);
-						naveControl.setActive(false);
-
-						releaseControll();
 
 					} else {
-						player.reposition(isInvert(), naveControl.getPx() - 5,
-								naveControl.getAllHeight() - player.getHeight());
-
+						player.reposition(invert, np[1].getMenu().getPx() - 5, getPy() + np[1].getPy() - player.getHeight());
 						player.setState(Player.State.IN_CONTROLLER);
-						naveControl.setActive(true);
-
-						releaseControll();
 					}
 
-				}
+				} else if (p.getType() == Menu.Type.ENERGY) {
+					p.getMenu().setVisible(true);
 
-			} else if (GraphicTool.g().collide(player, energy) != null) {
-				energy.setVisible(true);
-				// energy.setActive(false);
+					if (bAction && player.getItemActive() != null) {
+						player.removeItemActive();
 
-				if (bAction && player.getItemActive() != null) {
-					player.removeItemActive();
-
-					bar.incDamage(-50);
-					bar.incEnergy(90);
+						bar.incDamage(-50);
+						bar.incEnergy(90);
+					}
 				}
 
 			}
@@ -173,7 +172,7 @@ public class Nave extends ElementModel {
 		}
 		// ------------------------------
 
-		if (naveControl.isActive()) {
+		if (inControl()) {
 		}
 
 		if (on) {
@@ -199,38 +198,15 @@ public class Nave extends ElementModel {
 	/**
 	 * Reposiciona elementos na nave
 	 * 
-	 * @param el
 	 */
-	private void repCont(ElementModel el) {
-		float x = 0;
-		float y = 0;
+	private void repContAll() {
 
-		if (el == naveControl) {
-			x = places.getControl().x;
-			y = places.getControl().y;
+		for (NavePlaces p : np) {
+			if (p == null || !p.haveActiveMenu())
+				continue;
 
-		} else {
-			x = places.getEnergy().x;
-			y = places.getEnergy().y;
+			p.update(this);
 		}
-
-		if (isInvert()) {
-			// el.setPxy(getPx() + x, getAllHeight() - el.getHeight() - y);
-			el.setPxy(getAllWidth() - x, getAllHeight() - el.getHeight() - y);
-		} else {
-			// el.setPxy(getAllWidth() - x, getAllHeight() - el.getHeight() -
-			// y);
-			el.setPxy(getPx() + x, getAllHeight() - el.getHeight() - y);
-		}
-	}
-
-	/**
-	 * Force release keys
-	 */
-	private void releaseControll() {
-		/*
-		 * up = false; down = false; lft = false; rgt = false;
-		 */
 	}
 
 	private void keyUpdateShip() {
@@ -240,15 +216,15 @@ public class Nave extends ElementModel {
 
 		if (readyToFly()) {
 
-			if (!collideTop && naveControl.isActive() && player.getPad().is(KeysMap.UP)) {
+			if (!collideTop && inControl() && player.getPad().is(KeysMap.UP)) {
 				if (on && velRise < velRiseMax) {
 					velRise += velRiseInc;
 				}
-
+				
 				open = false;
 				on = true;
 
-			} else if (naveControl.isActive() && player.getPad().is(KeysMap.DOWN)) {
+			} else if (inControl() && player.getPad().is(KeysMap.DOWN)) {
 				open = false;
 				if (velRise > -velRiseMax) {
 					velRise -= velRiseInc * 2f;
@@ -273,7 +249,7 @@ public class Nave extends ElementModel {
 		if (collideBottom && velRise < 0f) {
 			velRise = 0f;
 			on = false;
-			// open = true;
+			open = true;
 
 		} else if (collideTop) {
 			on = false;
@@ -283,13 +259,13 @@ public class Nave extends ElementModel {
 
 		if (!collideBottom) {
 			if (on) {
-				if (naveControl.isActive() && player.getPad().is(KeysMap.LEFT)) {
+				if (inControl() && player.getPad().is(KeysMap.LEFT)) {
 					open = false;
 					if (_vel < velMax) {
 						_vel += velInc;
 					}
 
-				} else if (naveControl.isActive() && player.getPad().is(KeysMap.RIGHT)) {
+				} else if (inControl() && player.getPad().is(KeysMap.RIGHT)) {
 					open = false;
 					if (_vel > -velMax) {
 						_vel -= velInc;
@@ -334,9 +310,14 @@ public class Nave extends ElementModel {
 	}
 
 	private void keyUpdatePlayer() {
-		if (player == null || player.getState() != Player.State.IN) {
+		if (player.getState() != Player.State.IN) {
 			return;
 		}
+
+		/*
+		 * if (player.getState() == Player.State.IN_CONTROLLER) { if
+		 * (player.getPad().first(KeysMap.B2)) { invert = !invert; } }
+		 */
 
 		player.incPx(-_vel);
 
@@ -361,8 +342,6 @@ public class Nave extends ElementModel {
 			}
 		}
 
-		releaseControll();
-
 	}
 
 	/**
@@ -378,11 +357,11 @@ public class Nave extends ElementModel {
 		return getPy() < RISE_LIMIT || getPy() < 0;
 	}
 
-	private void fix() {
+	public void fix() {
 		bar.setDamage(0);
 	}
 
-	private boolean isFly() {
+	public boolean isFly() {
 		return getAllHeight() < Engine.getIWindowGame().getCanvasHeight();
 	}
 
@@ -399,19 +378,21 @@ public class Nave extends ElementModel {
 		SpriteTool s = SpriteTool.s(getImage()).matriz(2, 1);
 
 		if (open) {
-			s.invert(false).draw(g, Camera.c().fx(getPx()), Camera.c().fy(getPy()), 1, 0);
+			s.invert(invert).draw(g, Camera.c().fx(getPx()), Camera.c().fy(getPy()), 1, 0);
 
-			naveControl.drawMe(g);
-			energy.drawMe(g);
+			for (NavePlaces p : np) {
+				if (p != null && p.haveActiveMenu())
+					p.getMenu().drawMe(g);
+			}
 
 		} else {
-			s.invert(false).draw(g, Camera.c().fx(getPx()), Camera.c().fy(getPy()), 0, 0);
+			s.invert(invert).draw(g, Camera.c().fx(getPx()), Camera.c().fy(getPy()), 0, 0);
 
 			if (on) {
 				if (velRise >= -velRiseMax) {
 					s = SpriteTool.s(fogo).matriz(5, 1).invert(false);
-					s.draw(g, Camera.c().fx(getPx()) + 25, Camera.c().fy(getAllHeight() - 21),
-							player.getPad().is(KeysMap.DOWN) ? MathTool.r.nextInt(2) : SpriteTool.SORT, 0);
+					s.draw(g, Camera.c().fx(getPx()) + (invert ? 40 : 25), Camera.c().fy(getAllHeight() - 21), player.getPad()
+							.is(KeysMap.DOWN) ? MathTool.r.nextInt(2) : SpriteTool.SORT, 0);
 				}
 			}
 		}
@@ -440,7 +421,8 @@ public class Nave extends ElementModel {
 		this.invert = invert;
 	}
 
-	public void setPlaces(NavePlaces np) {
-		this.places = np;
+	private boolean inControl() {
+		return player != null && player.getState() == Player.State.IN_CONTROLLER;
 	}
+
 }

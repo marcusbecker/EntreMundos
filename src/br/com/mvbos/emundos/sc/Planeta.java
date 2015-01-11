@@ -6,18 +6,16 @@ import java.awt.Graphics2D;
 import javax.swing.ImageIcon;
 
 import br.com.mvbos.emundos.Config;
-import br.com.mvbos.emundos.data.NavePlaces;
 import br.com.mvbos.emundos.el.BackgroundElement;
 import br.com.mvbos.emundos.el.Bloco;
 import br.com.mvbos.emundos.el.Loja;
 import br.com.mvbos.emundos.el.Nave;
 import br.com.mvbos.emundos.el.Player;
 import br.com.mvbos.jeg.element.ElementModel;
-import br.com.mvbos.jeg.engine.JoyPad;
 import br.com.mvbos.jeg.engine.Engine;
 import br.com.mvbos.jeg.engine.GraphicTool;
+import br.com.mvbos.jeg.engine.JoyPad;
 import br.com.mvbos.jeg.engine.KeysMap;
-import br.com.mvbos.jeg.scene.Pxy;
 import br.com.mvbos.jeg.scene.impl.SceneDefault;
 import br.com.mvbos.jeg.window.Camera;
 import br.com.mvbos.jeg.window.impl.MemoryImpl;
@@ -45,7 +43,7 @@ public class Planeta extends SceneDefault {
 	public static int base = 75;
 
 	private final JoyPad pad = new JoyPad(new int[] { 38, 40, 37, 39, 81, 69 }, new char[] { 'w', 's', 'a', 'd', 'q',
-			'e' });
+			'e', 'r' });
 
 	@Override
 	public boolean startScene() {
@@ -56,10 +54,10 @@ public class Planeta extends SceneDefault {
 		p = new Player();
 		p.setControl(pad);
 
-		NavePlaces np = new NavePlaces();// config externa
+		/*NavePlaces np = new NavePlaces();// config externa
 		np.setControl(new Pxy(55, 0));
 		np.setEnergy(new Pxy(30, 0));
-		n.setPlaces(np);
+		n.setPlaces(np);*/
 
 		Loja loja = new Loja(/* this */);
 		loja.setSize(170, 140);
@@ -101,9 +99,9 @@ public class Planeta extends SceneDefault {
 
 		Camera.c().config(w, h).rollY(Planeta.h - Engine.getIWindowGame().getCanvasHeight());
 		// System.out.println(Camera.c());
-		
+
 		fbg.update();
-		
+
 		return true;
 	}
 
@@ -114,8 +112,7 @@ public class Planeta extends SceneDefault {
 
 	@Override
 	public void update() {
-		
-		
+
 		if (G.collide(p, n) != null) {
 			n.setPlayer(p);
 			p.inShip();
@@ -198,6 +195,11 @@ public class Planeta extends SceneDefault {
 
 	@Override
 	public void keyEvent(char keyChar, int keyCode) {
+		KeysMap k = comparKey(keyChar, keyCode);
+		pad.press(k);
+	}
+
+	public KeysMap comparKey(char keyChar, int keyCode) {
 		KeysMap k = null;
 
 		if (pad.isKey(keyChar, keyCode, 0)) {
@@ -217,35 +219,19 @@ public class Planeta extends SceneDefault {
 
 		} else if (pad.isKey(keyChar, keyCode, 5)) {
 			k = KeysMap.B1;
+
+		} else if (pad.isKey(keyChar, keyCode, 6)) {
+			k = KeysMap.B2;
 		}
 
-		pad.press(k);
+		return k;
 	}
 
 	@Override
 	public void keyRelease(char keyChar, int keyCode) {
 		p.stop();
 
-		KeysMap k = null;
-
-		if (pad.isKey(keyChar, keyCode, 0)) {
-			k = KeysMap.UP;
-
-		} else if (pad.isKey(keyChar, keyCode, 1)) {
-			k = KeysMap.DOWN;
-
-		} else if (pad.isKey(keyChar, keyCode, 2)) {
-			k = KeysMap.LEFT;
-
-		} else if (pad.isKey(keyChar, keyCode, 3)) {
-			k = KeysMap.RIGHT;
-
-		} else if (pad.isKey(keyChar, keyCode, 4)) {
-			k = KeysMap.B0;
-
-		} else if (pad.isKey(keyChar, keyCode, 5)) {
-			k = KeysMap.B1;
-		}
+		KeysMap k = comparKey(keyChar, keyCode);
 
 		pad.release(k);
 	}
