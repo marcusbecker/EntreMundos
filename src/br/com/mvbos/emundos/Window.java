@@ -20,8 +20,8 @@ import br.com.mvbos.jeg.window.IWindowGame;
 
 public class Window extends JFrame implements IWindowGame {
 
-	private static final int FPS = 20;
-	private static final int UPS = 30;
+	private static final int FPS = 1000 / 20;
+	private static final int UPS = 1000 / 30;
 
 	private static final long serialVersionUID = -8393832754925763237L;
 

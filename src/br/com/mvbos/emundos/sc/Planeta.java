@@ -2,6 +2,7 @@ package br.com.mvbos.emundos.sc;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.event.KeyEvent;
 
 import javax.swing.ImageIcon;
 
@@ -42,8 +43,8 @@ public class Planeta extends SceneDefault {
 
 	public static int base = 75;
 
-	private final JoyPad pad = new JoyPad(new int[] { 38, 40, 37, 39, 81, 69 }, new char[] { 'w', 's', 'a', 'd', 'q',
-			'e', 'r' });
+	private final JoyPad pad = new JoyPad(new int[] { KeyEvent.VK_UP, KeyEvent.VK_DOWN, KeyEvent.VK_LEFT, KeyEvent.VK_RIGHT, 81,
+			69 }, new char[] { 'w', 's', 'a', 'd', 'q', 'e', 'r' });
 
 	@Override
 	public boolean startScene() {
@@ -54,10 +55,10 @@ public class Planeta extends SceneDefault {
 		p = new Player();
 		p.setControl(pad);
 
-		/*NavePlaces np = new NavePlaces();// config externa
-		np.setControl(new Pxy(55, 0));
-		np.setEnergy(new Pxy(30, 0));
-		n.setPlaces(np);*/
+		/*
+		 * NavePlaces np = new NavePlaces();// config externa np.setControl(new
+		 * Pxy(55, 0)); np.setEnergy(new Pxy(30, 0)); n.setPlaces(np);
+		 */
 
 		Loja loja = new Loja(/* this */);
 		loja.setSize(170, 140);
